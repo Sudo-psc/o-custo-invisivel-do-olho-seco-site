@@ -134,6 +134,36 @@ def main() -> int:
             page.set_viewport_size({"width": 1440, "height": 1000})
             page.locator("#back-home").click()
 
+            page.evaluate(
+                """
+                localStorage.setItem('ocioso-interview-drafts-v1', JSON.stringify({
+                  pre: {
+                    type: 'pre',
+                    step: 0,
+                    participantCode: 'RASCUNHO-ANTIGO',
+                    participantRole: '',
+                    consent: false,
+                    answers: {association: {choice: 'A', text: 'Resposta anterior'}}
+                  }
+                }));
+                """
+            )
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.locator('[data-start="pre"]').click()
+            assert page.locator("#question-host").is_visible()
+            page.locator("#next-question").click()
+            assert page.locator("#setup-step").is_visible()
+            assert page.locator(".consent-panel.has-error").is_visible()
+            assert "Confirme o consentimento" in page.locator("#form-error").inner_text()
+            page.wait_for_timeout(120)
+            assert page.evaluate("document.activeElement.id") == "submission-consent"
+            assert_consent_layout(page)
+            page.evaluate("window.scrollTo(0, 0)")
+            page.screenshot(path=EVIDENCE / "entrevistas-consentimento-validacao-mobile.png", full_page=True)
+            page.locator("#back-home").click()
+            page.evaluate("localStorage.clear()")
+            page.set_viewport_size({"width": 1440, "height": 1000})
+
             answer(page, "pre", 0)
             assert page.locator("#delivery-title").inner_text() == "Resposta recebida"
             page.locator("#finish-home").click()

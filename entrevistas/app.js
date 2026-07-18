@@ -20,6 +20,7 @@
     participantCode: document.getElementById("participant-code"),
     participantRole: document.getElementById("participant-role"),
     submissionConsent: document.getElementById("submission-consent"),
+    consentPanel: document.querySelector(".consent-panel"),
     setupStep: document.getElementById("setup-step"),
     progressText: document.getElementById("progress-text"),
     progressPercent: document.getElementById("progress-percent"),
@@ -116,6 +117,26 @@
   function clearError() {
     elements.formError.hidden = true;
     elements.formError.textContent = "";
+    elements.consentPanel.classList.remove("has-error");
+    elements.submissionConsent.removeAttribute("aria-invalid");
+    elements.participantCode.closest(".field-group")?.classList.remove("has-error");
+    elements.participantCode.removeAttribute("aria-invalid");
+  }
+
+  function showSetupError(message, field, container) {
+    if (state.setupComplete) {
+      state.setupComplete = false;
+      renderStep();
+      saveDraft();
+    }
+    showError(message);
+    field.setAttribute("aria-invalid", "true");
+    container?.classList.add("has-error");
+    window.setTimeout(() => {
+      container?.scrollIntoView({ behavior: "smooth", block: "center" });
+      field.focus({ preventScroll: true });
+    }, 80);
+    return false;
   }
 
   function loadDraft(type) {
@@ -360,19 +381,25 @@
     state.participantRole = elements.participantRole.value;
     state.consent = elements.submissionConsent.checked;
     if (!state.participantCode) {
-      showError("Informe um código do participante para permitir a comparação entre as etapas.");
-      elements.participantCode.focus();
-      return false;
+      return showSetupError(
+        "Informe um código do participante para permitir a comparação entre as etapas.",
+        elements.participantCode,
+        elements.participantCode.closest(".field-group")
+      );
     }
     if (!/^[A-Za-z0-9_-]{3,32}$/.test(state.participantCode)) {
-      showError("Use de 3 a 32 caracteres no código: letras sem acento, números, hífen ou sublinhado.");
-      elements.participantCode.focus();
-      return false;
+      return showSetupError(
+        "Use de 3 a 32 caracteres no código: letras sem acento, números, hífen ou sublinhado.",
+        elements.participantCode,
+        elements.participantCode.closest(".field-group")
+      );
     }
     if (!state.consent) {
-      showError("Confirme o consentimento para participar da entrevista editorial.");
-      elements.submissionConsent.focus();
-      return false;
+      return showSetupError(
+        "Confirme o consentimento para participar da entrevista editorial.",
+        elements.submissionConsent,
+        elements.consentPanel
+      );
     }
     if (!state.setupComplete) return true;
 
