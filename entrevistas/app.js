@@ -305,7 +305,7 @@
       return false;
     }
     if (!state.consent) {
-      showError("Confirme o consentimento para enviar as respostas editoriais ao Notion.");
+      showError("Confirme o consentimento para participar da entrevista editorial.");
       elements.submissionConsent.focus();
       return false;
     }
@@ -381,7 +381,7 @@
   function showResult(completion) {
     const set = sets[completion.type];
     elements.resultTitle.textContent = `${set.title} concluída`;
-    elements.resultLead.textContent = `As oito respostas do código ${completion.participantCode} foram preservadas neste navegador. O status abaixo confirma o envio à base editorial.`;
+    elements.resultLead.textContent = `Entrevista concluída para o código ${completion.participantCode}.`;
     renderPreview(completion);
 
     const pair = findPair(completion.participantCode);
@@ -426,11 +426,11 @@
   async function submitCompletion(completion) {
     const endpoint = String(window.INTERVIEW_API_URL || "").trim();
     if (!endpoint) {
-      setDeliveryState("error", "Integração ainda não ativada", "A resposta permanece salva localmente. Tente novamente quando a API estiver configurada.");
+      setDeliveryState("error", "Serviço indisponível", "Tente novamente mais tarde.");
       return;
     }
 
-    setDeliveryState("sending", "Enviando ao Notion", "A cópia local continuará disponível mesmo se a rede falhar.");
+    setDeliveryState("sending", "Salvando resposta", "Aguarde a confirmação.");
     elements.retrySubmission.hidden = true;
     try {
       const response = await fetch(endpoint, {
@@ -440,9 +440,9 @@
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.ok !== true) throw new Error(data.error || `HTTP ${response.status}`);
-      setDeliveryState("success", data.duplicate ? "Resposta já recebida" : "Resposta enviada ao Notion", "O registro editorial foi confirmado com segurança.");
+      setDeliveryState("success", data.duplicate ? "Resposta já recebida" : "Resposta recebida", "Confirmação concluída.");
     } catch (_error) {
-      setDeliveryState("error", "Envio não confirmado", "Sua resposta continua salva neste navegador. Verifique a conexão e tente novamente.");
+      setDeliveryState("error", "Não foi possível confirmar", "Verifique sua conexão e tente novamente.");
     }
   }
 

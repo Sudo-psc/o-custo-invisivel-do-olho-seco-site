@@ -106,7 +106,7 @@ def main() -> int:
             page.locator("#back-home").click()
 
             answer(page, "pre", 0)
-            assert "enviada ao notion" in page.locator("#delivery-title").inner_text().lower()
+            assert page.locator("#delivery-title").inner_text() == "Resposta recebida"
             page.locator("#finish-home").click()
             answer(page, "post", 1)
             assert page.locator("#comparison-card").is_visible()

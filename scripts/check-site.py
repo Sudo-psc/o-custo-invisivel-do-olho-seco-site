@@ -44,6 +44,9 @@ app = (ROOT / "entrevistas/app.js").read_text()
 for needle in ("Outros: digite", "submitCompletion", "fetch(endpoint", "localStorage", "buildComparisonText"):
     if needle not in app: fail(f"app sem {needle}")
 if "NOTION_TOKEN" in app or "NOTION_TOKEN" in (ROOT / "entrevistas/config.js").read_text(): fail("segredo presente no cliente")
+public_interview = app + (ROOT / "entrevistas/index.html").read_text()
+for forbidden in ("notion", "envio", "enviad"):
+    if forbidden in public_interview.lower(): fail(f"texto público proibido sobre transmissão: {forbidden}")
 
 styles = (ROOT / "entrevistas/styles.css").read_text()
 for needle in (
