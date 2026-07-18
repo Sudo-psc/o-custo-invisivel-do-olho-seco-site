@@ -3,37 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Pré-lançamento sem venda ativa: a página permanece fora dos índices até
+       a abertura do contrato comercial (ver README e scripts/check-site.py). -->
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#04101f">
   <title>O Custo Invisível do Olho Seco — edição v2.9.29</title>
   <meta name="description" content="Um método executivo para investigar sintomas visuais no trabalho sem fabricar causalidade ou ROI.">
+  <meta name="author" content="Dr. Philipe Saraiva Cruz">
+  <link rel="canonical" href="https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Open Graph / Twitter: melhora o preview compartilhado mesmo sob noindex. -->
+  <meta property="og:type" content="book">
+  <meta property="og:site_name" content="O Custo Invisível do Olho Seco">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="O Custo Invisível do Olho Seco — método executivo">
+  <meta property="og:description" content="Separar sintomas, capacidade, operação e caixa — e decidir se vale encerrar, ajustar ou avançar, sem fabricar ROI.">
+  <meta property="og:url" content="https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/">
+  <meta property="og:image" content="https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Capa de O Custo Invisível do Olho Seco, edição v2.9.29.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="O Custo Invisível do Olho Seco — método executivo">
+  <meta name="twitter:description" content="Um método executivo para investigar sintomas visuais no trabalho sem fabricar causalidade ou ROI.">
+  <meta name="twitter:image" content="https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/assets/og-image.png">
+
+  <link rel="preload" href="assets/experience.css" as="style">
   <link rel="stylesheet" href="assets/experience.css">
+
+  <!-- Dados estruturados: apenas o que está visível na página. Sem Offer
+       (não há venda ativa) e sem avaliações (nenhuma foi coletada). -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "name": "O Custo Invisível do Olho Seco",
+    "bookEdition": "v2.9.29",
+    "inLanguage": "pt-BR",
+    "image": "https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/assets/capa-livro.png",
+    "url": "https://sudo-psc.github.io/o-custo-invisivel-do-olho-seco-site/",
+    "abstract": "Método executivo para investigar sintomas visuais no trabalho sem fabricar causalidade, produtividade ou ROI.",
+    "genre": "Saúde ocupacional; gestão baseada em evidências",
+    "author": {
+      "@type": "Person",
+      "name": "Dr. Philipe Saraiva Cruz",
+      "jobTitle": "Médico"
+    }
+  }
+  </script>
 </head>
 <body>
-  <!-- Superfície viva: simulação do filme lacrimal em WebGL. -->
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Superfície viva: simulação do filme lacrimal em WebGL (puramente decorativa). -->
   <canvas id="tearfilm" aria-hidden="true"></canvas>
   <div class="progress" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="wrap">
-      <span class="brand"><span class="dot" aria-hidden="true"></span>O Custo Invisível do Olho Seco</span>
+      <a class="brand" href="#topo"><span class="dot" aria-hidden="true"></span>O Custo Invisível do Olho Seco</a>
       <nav class="topnav" aria-label="Navegação principal">
         <a href="#custo" class="hide-sm">O custo</a>
         <a href="#empresa" class="hide-sm">Calculadora</a>
         <a href="entrevistas/">Entrevistas</a>
         <a href="#empresa">Para organizações</a>
+        <button id="calm-toggle" class="calm-toggle" type="button" aria-pressed="false" title="Reduzir animações">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c-4.97 0-9-4.03-9-9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span class="calm-label">Modo calmo</span>
+        </button>
       </nav>
     </div>
   </header>
 
-  <main>
+  <main id="conteudo">
     <!-- ===================================================== HERO -->
-    <section class="hero" id="topo">
+    <section class="hero" id="topo" aria-labelledby="hero-title">
       <div class="wrap">
         <div class="reveal">
-          <span class="eyebrow">Infraestrutura de decisão · edição v2.9.29</span>
-          <h1>Meça o problema antes de pedir investimento: leve uma <span class="shimmer">decisão defensável de saúde visual</span> à diretoria.</h1>
+          <p class="eyebrow">Infraestrutura de decisão · edição v2.9.29</p>
+          <h1 id="hero-title">Meça o problema antes de pedir investimento: leve uma <span class="shimmer">decisão defensável de saúde visual</span> à diretoria.</h1>
           <p class="lead">Para saúde ocupacional, RH, ergonomia e SESMT em organizações intensivas em telas: um método para separar sintomas, capacidade, operação e caixa — e decidir se vale encerrar, ajustar ou avançar sem fabricar ROI.</p>
           <div class="actions">
             <a class="btn primary" href="assets/amostra-v2.9.29.pdf" data-event="sample_download">Ler amostra de 30 páginas</a>
@@ -46,66 +96,71 @@
           </div>
         </div>
 
-        <aside class="glass reveal">
-          <h2>O que o livro entrega</h2>
-          <ul>
-            <li>resumo executivo de dez minutos e rotas por função;</li>
-            <li>quatro gates entre hipótese e caixa;</li>
-            <li>BOM parametrizado, critérios de parada e decisão ternária;</li>
-            <li>ferramentas para uma primeira fase com possibilidade de resultado nulo.</li>
-          </ul>
-          <p class="note" style="margin-top:18px">Material educativo. Não substitui avaliação médica individual e não promete produtividade, economia, causalidade ou retorno.</p>
-        </aside>
+        <div class="hero-side reveal">
+          <figure class="book">
+            <img src="assets/livro-3d.png" width="960" height="1160" alt="Render tridimensional do livro O Custo Invisível do Olho Seco." decoding="async" fetchpriority="low">
+          </figure>
+          <aside class="glass" aria-label="O que o livro entrega">
+            <h2>O que o livro entrega</h2>
+            <ul>
+              <li>resumo executivo de dez minutos e rotas por função;</li>
+              <li>quatro gates entre hipótese e caixa;</li>
+              <li>BOM parametrizado, critérios de parada e decisão ternária;</li>
+              <li>ferramentas para uma primeira fase com possibilidade de resultado nulo.</li>
+            </ul>
+            <p class="note">Material educativo. Não substitui avaliação médica individual e não promete produtividade, economia, causalidade ou retorno.</p>
+          </aside>
+        </div>
       </div>
 
       <div class="scroll-cue" aria-hidden="true"><span>role para investigar</span><span class="line"></span></div>
     </section>
 
     <!-- ===================================================== O CUSTO (scrollytelling) -->
-    <section class="section" id="custo">
+    <section class="section" id="custo" aria-labelledby="custo-title">
       <div class="wrap">
         <div class="section-head reveal">
-          <span class="eyebrow">Por que "invisível"</span>
-          <h2>O filme lacrimal se rompe antes do próximo piscar — e o custo mora nesse intervalo.</h2>
+          <p class="eyebrow">Por que "invisível"</p>
+          <h2 id="custo-title">O filme lacrimal se rompe antes do próximo piscar — e o custo mora nesse intervalo.</h2>
           <p>O olho seco raramente aparece como uma linha no orçamento. Ele se dilui em microinterrupções, correções e desconforto que ninguém contabiliza. Role e observe o filme se desestabilizar.</p>
         </div>
 
         <div class="stage">
           <div class="sticky reveal">
-            <canvas id="breakup" aria-label="Visualização da ruptura do filme lacrimal conforme a rolagem"></canvas>
+            <canvas id="breakup" role="img" aria-label="Visualização do filme lacrimal se rompendo em pontos secos conforme a rolagem avança."></canvas>
           </div>
-          <div class="steps">
-            <article class="step">
-              <span class="big">1</span>
+          <ol class="steps">
+            <li class="step">
+              <span class="big" aria-hidden="true">1</span>
               <h3>Um sintoma sem fatura</h3>
               <p>Ardência, embaçamento intermitente, pausas para "descansar a vista". Nenhum desses eventos chega ao controle de custos, mas todos consomem atenção durante o trabalho de tela.</p>
-            </article>
-            <article class="step">
-              <span class="big">2</span>
+            </li>
+            <li class="step">
+              <span class="big" aria-hidden="true">2</span>
               <h3>Capacidade, não economia</h3>
               <p>O que se pode estimar com honestidade é <em>capacidade equivalente</em> — não um ROI. Quanto de esforço qualificado atravessa a instabilidade sem que ninguém a nomeie.</p>
-            </article>
-            <article class="step">
-              <span class="big">3</span>
+            </li>
+            <li class="step">
+              <span class="big" aria-hidden="true">3</span>
               <h3>Quatro gates até o caixa</h3>
               <p>Entre a hipótese e qualquer decisão financeira existem gates: governança, dados, desenho e critérios de parada. Pular um deles fabrica causalidade — exatamente o que o método recusa.</p>
-            </article>
-            <article class="step">
-              <span class="big">0</span>
+            </li>
+            <li class="step">
+              <span class="big" aria-hidden="true">0</span>
               <h3>O resultado pode ser nulo</h3>
               <p>A primeira fase é desenhada para admitir "não valeu a pena". Um método que não pode falhar não está medindo nada.</p>
-            </article>
-          </div>
+            </li>
+          </ol>
         </div>
       </div>
     </section>
 
     <!-- ===================================================== FORMATOS -->
-    <section class="section" id="comprar">
+    <section class="section" id="comprar" aria-labelledby="comprar-title">
       <div class="wrap">
         <div class="section-head reveal">
-          <span class="eyebrow">Formatos, canais e preços de referência</span>
-          <h2>Preços sugeridos para o lançamento no Brasil</h2>
+          <p class="eyebrow">Formatos, canais e preços de referência</p>
+          <h2 id="comprar-title">Preços sugeridos para o lançamento no Brasil</h2>
           <p>Sujeitos à validação do custo de impressão e à aprovação final em cada plataforma.</p>
         </div>
         <div class="cards">
@@ -121,11 +176,11 @@
     </section>
 
     <!-- ===================================================== PAPÉIS -->
-    <section class="section">
+    <section class="section" aria-labelledby="papeis-title">
       <div class="wrap">
         <div class="section-head reveal">
-          <span class="eyebrow">Quem conduz cada decisão</span>
-          <h2>Três papéis, sem mistura de responsabilidades</h2>
+          <p class="eyebrow">Quem conduz cada decisão</p>
+          <h2 id="papeis-title">Três papéis, sem mistura de responsabilidades</h2>
         </div>
         <div class="cards">
           <article class="card role reveal"><h3>Campeão interno</h3><p>Saúde ocupacional, SESMT, ergonomia ou People/RH organiza a pergunta, os papéis e a via de cuidado.</p></article>
@@ -136,59 +191,59 @@
     </section>
 
     <!-- ===================================================== TRÊS CAMINHOS -->
-    <section class="section">
+    <section class="section" aria-labelledby="caminhos-title">
       <div class="wrap">
         <div class="section-head reveal">
-          <span class="eyebrow">Três caminhos, sem mistura de papéis</span>
-          <h2>Escolha por onde começar</h2>
+          <p class="eyebrow">Três caminhos, sem mistura de papéis</p>
+          <h2 id="caminhos-title">Escolha por onde começar</h2>
         </div>
         <div class="cards">
-          <article class="card reveal"><span class="rank">01</span><h3>Quero ler</h3><p>Conheça tese, método, limites e ferramentas antes de decidir pela compra.</p><a class="inline" href="assets/amostra-v2.9.29.pdf" data-event="sample_download">Abrir amostra</a></article>
-          <article class="card reveal"><span class="rank">02</span><h3>Quero levar à diretoria</h3><p>Use o kit para formular a pergunta sem prometer resposta.</p><a class="inline" href="kit/" data-event="kit_access">Acessar materiais</a></article>
-          <article class="card reveal"><span class="rank">03</span><h3>Quero avaliar prontidão</h3><p>Revise governança, dados, licença, capacidade e critérios de parada sem coletar dados de saúde.</p><a class="inline" href="prontidao/" data-event="readiness_start">Iniciar avaliação</a></article>
+          <article class="card reveal"><span class="rank" aria-hidden="true">01</span><h3>Quero ler</h3><p>Conheça tese, método, limites e ferramentas antes de decidir pela compra.</p><a class="inline" href="assets/amostra-v2.9.29.pdf" data-event="sample_download">Abrir amostra</a></article>
+          <article class="card reveal"><span class="rank" aria-hidden="true">02</span><h3>Quero levar à diretoria</h3><p>Use o kit para formular a pergunta sem prometer resposta.</p><a class="inline" href="kit/" data-event="kit_access">Acessar materiais</a></article>
+          <article class="card reveal"><span class="rank" aria-hidden="true">03</span><h3>Quero avaliar prontidão</h3><p>Revise governança, dados, licença, capacidade e critérios de parada sem coletar dados de saúde.</p><a class="inline" href="prontidao/" data-event="readiness_start">Iniciar avaliação</a></article>
         </div>
       </div>
     </section>
 
     <!-- ===================================================== CALCULADORA -->
-    <section class="section" id="empresa">
+    <section class="section" id="empresa" aria-labelledby="calc-title">
       <div class="wrap">
         <div class="section-head reveal">
-          <span class="eyebrow">Calculadora de capacidade e limiar</span>
-          <h2>Capacidade equivalente — não economia, ROI ou payback</h2>
+          <p class="eyebrow">Calculadora de capacidade e limiar</p>
+          <h2 id="calc-title">Capacidade equivalente — não economia, ROI ou payback</h2>
           <p>Esta simulação mostra a capacidade equivalente sob premissas e, quando há custo cotado, a fração que precisaria aparecer como benefício financeiro incremental e atribuível para cobrir esse custo.</p>
         </div>
 
         <div class="glass reveal">
-          <div class="calc">
+          <form class="calc" id="calc-form" novalidate>
             <div class="fields">
-              <div class="field"><label for="n">Pessoas no escopo</label><input id="n" type="number" min="0" value="100" inputmode="numeric"></div>
-              <div class="field"><label for="c">Custo direto anual do trabalho por pessoa (R$)</label><input id="c" type="number" min="0" value="0" inputmode="numeric"></div>
-              <div class="field"><label for="p">Fração sintomática assumida (%)</label><input id="p" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
-              <div class="field"><label for="l">Limitação percebida assumida (%)</label><input id="l" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
-              <div class="field"><label for="k">Custo cotado no mesmo horizonte (R$)</label><input id="k" type="number" min="0" value="0" inputmode="numeric"></div>
-              <button class="btn primary" id="calc" type="button">Calcular cenário</button>
+              <div class="field"><label for="n">Pessoas no escopo</label><input id="n" name="n" type="number" min="0" value="100" inputmode="numeric"></div>
+              <div class="field"><label for="c">Custo direto anual do trabalho por pessoa (R$)</label><input id="c" name="c" type="number" min="0" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="p">Fração sintomática assumida (%)</label><input id="p" name="p" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="l">Limitação percebida assumida (%)</label><input id="l" name="l" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="k">Custo cotado no mesmo horizonte (R$)</label><input id="k" name="k" type="number" min="0" value="0" inputmode="numeric"></div>
+              <button class="btn primary" id="calc" type="submit">Calcular cenário</button>
             </div>
 
-            <div class="readout" aria-live="polite">
+            <output class="readout" for="n c p l k" aria-live="polite">
               <div class="metric"><span class="k">Capacidade equivalente simulada</span><span class="v" id="out-capacity">indisponível</span></div>
               <hr>
               <div class="metric"><span class="k">Limiar de cobertura</span><span class="v" id="out-threshold">indisponível</span></div>
               <hr>
               <div class="metric"><span class="k">ROI</span><span class="v small" id="out-roi">Preencha premissas documentadas. Zero significa indisponível, não ausência de custo ou efeito.</span></div>
-            </div>
-          </div>
+            </output>
+          </form>
         </div>
         <p class="note" style="margin-top:16px">Capacidade equivalente = N × custo direto × fração sintomática × limitação percebida. Limiar = custo cotado ÷ capacidade equivalente. Nenhuma dessas fórmulas prova benefício ou atribuição.</p>
       </div>
     </section>
 
     <!-- ===================================================== ESCUTA EDITORIAL -->
-    <section class="section">
+    <section class="section" aria-labelledby="escuta-title">
       <div class="wrap">
         <div class="band reveal">
-          <span class="eyebrow">Escuta editorial</span>
-          <h2>O que você espera antes — e o que permanece depois?</h2>
+          <p class="eyebrow">Escuta editorial</p>
+          <h2 id="escuta-title">O que você espera antes — e o que permanece depois?</h2>
           <p>Responda às entrevistas pré-leitura e pós-leitura com o mesmo código. São oito perguntas em cada etapa, com alternativas orientadoras e espaço para escrever com suas próprias palavras.</p>
           <div class="actions">
             <a class="btn primary" href="entrevistas/" data-event="interviews_view">Abrir entrevistas</a>
@@ -198,10 +253,10 @@
     </section>
 
     <!-- ===================================================== SERVIÇOS -->
-    <section class="section">
+    <section class="section" aria-labelledby="servicos-title">
       <div class="wrap">
         <div class="glass reveal">
-          <h2 style="font-size:clamp(1.6rem,3vw,2.4rem)">Precisa de apoio para organizar a decisão?</h2>
+          <h2 id="servicos-title" style="font-size:clamp(1.6rem,3vw,2.4rem)">Precisa de apoio para organizar a decisão?</h2>
           <p style="color:var(--muted);margin-top:12px;max-width:60ch">O livro e o kit podem ser usados sem contratar o autor. Se a avaliação indicar lacunas de governança, dados ou critérios de parada, existe uma rota opcional de apoio organizacional — separada do atendimento clínico e sem promessa de piloto, produtividade ou ROI.</p>
           <div class="actions" style="margin-top:22px">
             <a class="btn" href="servicos/" data-event="services_view">Conhecer limites e critérios de adequação</a>

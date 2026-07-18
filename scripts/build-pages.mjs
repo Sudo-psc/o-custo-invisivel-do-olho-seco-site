@@ -14,7 +14,7 @@ if (parsed.protocol !== "https:" && !new Set(["127.0.0.1", "localhost"]).has(par
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 
-for (const name of ["index.html", "release.json", ".nojekyll", "assets", "entrevistas", "kit", "prontidao", "servicos"]) {
+for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "assets", "entrevistas", "kit", "prontidao", "servicos"]) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
 
