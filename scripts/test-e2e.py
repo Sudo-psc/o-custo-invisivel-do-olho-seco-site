@@ -61,6 +61,18 @@ def answer(page, kind: str, option_index: int) -> None:
     page.locator('#delivery-card[data-status="success"]').wait_for()
 
 
+def assert_consent_layout(page) -> None:
+    row = page.locator(".consent-row").bounding_box()
+    checkbox = page.locator("#submission-consent").bounding_box()
+    copy = page.locator(".consent-row span").bounding_box()
+    assert row and checkbox and copy
+    assert 16 <= checkbox["width"] <= 22, checkbox
+    assert 16 <= checkbox["height"] <= 22, checkbox
+    assert checkbox["x"] + checkbox["width"] <= row["x"] + row["width"] + 1
+    assert copy["x"] >= checkbox["x"] + checkbox["width"] + 8
+    assert copy["x"] + copy["width"] <= row["x"] + row["width"] + 1
+
+
 def main() -> int:
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer(("127.0.0.1", 4173), Handler)
@@ -83,6 +95,15 @@ def main() -> int:
             page.evaluate("localStorage.clear()")
             page.reload(wait_until="networkidle")
             page.screenshot(path=EVIDENCE / "entrevistas-home.png", full_page=True)
+
+            page.locator('[data-start="pre"]').click()
+            assert_consent_layout(page)
+            page.screenshot(path=EVIDENCE / "entrevistas-consentimento-desktop.png", full_page=True)
+            page.set_viewport_size({"width": 390, "height": 844})
+            assert_consent_layout(page)
+            page.screenshot(path=EVIDENCE / "entrevistas-consentimento-mobile.png", full_page=True)
+            page.set_viewport_size({"width": 1440, "height": 1000})
+            page.locator("#back-home").click()
 
             answer(page, "pre", 0)
             assert "enviada ao notion" in page.locator("#delivery-title").inner_text().lower()

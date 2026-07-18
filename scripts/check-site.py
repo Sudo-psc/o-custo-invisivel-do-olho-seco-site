@@ -45,6 +45,16 @@ for needle in ("Outros: digite", "submitCompletion", "fetch(endpoint", "localSto
     if needle not in app: fail(f"app sem {needle}")
 if "NOTION_TOKEN" in app or "NOTION_TOKEN" in (ROOT / "entrevistas/config.js").read_text(): fail("segredo presente no cliente")
 
+styles = (ROOT / "entrevistas/styles.css").read_text()
+for needle in (
+    '.identity-card input:not([type="checkbox"])',
+    '.consent-row input[type="checkbox"]',
+    "min-width: 18px",
+    ".consent-row span",
+    "overflow-wrap: anywhere",
+):
+    if needle not in styles: fail(f"regressão no layout do consentimento: {needle}")
+
 api = (ROOT / "api/responses.js").read_text()
 for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):
     if needle not in api: fail(f"API sem {needle}")
