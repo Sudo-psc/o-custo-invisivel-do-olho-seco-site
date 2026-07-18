@@ -5,6 +5,10 @@ const MAX_BODY_BYTES = 48_000;
 const VALID_CODE = /^[A-Za-z0-9_-]{3,32}$/;
 const VALID_CHOICES = new Set(["A", "B", "C", "D", "E"]);
 
+function notionToken() {
+  return process.env.NOTION_TOKEN || process.env.NOTION_API_KEY || "";
+}
+
 function json(res, status, body) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -80,7 +84,7 @@ async function notionRequest(path, options = {}) {
     lastResponse = await fetch(`https://api.notion.com${path}`, {
       ...options,
       headers: {
-        Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+        Authorization: `Bearer ${notionToken()}`,
         "Notion-Version": NOTION_VERSION,
         "Content-Type": "application/json",
         ...(options.headers || {})
@@ -150,7 +154,7 @@ async function handler(req, res) {
   }
   if (req.method !== "POST") return json(res, 405, { ok: false, error: "Método não permitido." });
   if (!corsAllowed) return json(res, 403, { ok: false, error: "Origem não autorizada." });
-  if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATA_SOURCE_ID) return json(res, 503, { ok: false, error: "Integração indisponível." });
+  if (!notionToken() || !process.env.NOTION_DATA_SOURCE_ID) return json(res, 503, { ok: false, error: "Integração indisponível." });
   if (Number(req.headers["content-length"] || 0) > MAX_BODY_BYTES) return json(res, 413, { ok: false, error: "Conteúdo muito grande." });
 
   let payload = req.body;

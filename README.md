@@ -14,7 +14,7 @@ Landing page estática de pré-lançamento e entrevistas editoriais pré/pós-le
 
 Na Vercel:
 
-- `NOTION_TOKEN` — segredo da integração interna do Notion;
+- `NOTION_TOKEN` ou `NOTION_API_KEY` — segredo da integração interna do Notion;
 - `NOTION_DATA_SOURCE_ID` — ID da fonte de dados de entrevistas;
 - `ALLOWED_ORIGINS` — origens aceitas, separadas por vírgula.
 

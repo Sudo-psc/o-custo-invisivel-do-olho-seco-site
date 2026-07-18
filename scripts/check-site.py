@@ -46,7 +46,7 @@ for needle in ("Outros: digite", "submitCompletion", "fetch(endpoint", "localSto
 if "NOTION_TOKEN" in app or "NOTION_TOKEN" in (ROOT / "entrevistas/config.js").read_text(): fail("segredo presente no cliente")
 
 api = (ROOT / "api/responses.js").read_text()
-for needle in ("ALLOWED_ORIGINS", "NOTION_TOKEN", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):
+for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):
     if needle not in api: fail(f"API sem {needle}")
 
 print("APROVA: site v2.9.26, amostra 30 páginas, entrevistas 8+8 e API Notion sem segredo no cliente")
