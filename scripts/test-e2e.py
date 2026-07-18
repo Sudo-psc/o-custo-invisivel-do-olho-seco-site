@@ -99,6 +99,8 @@ def main() -> int:
             assert page.locator('a[href="entrevistas/"]').count() >= 1
             page.screenshot(path=EVIDENCE / "landing-home.png", full_page=True)
             page.goto(BASE_URL, wait_until="networkidle")
+            for selector in ('link[href^="styles.css?v="]', 'script[src^="data.js?v="]', 'script[src^="config.js?v="]', 'script[src^="app.js?v="]'):
+                assert page.locator(selector).count() == 1
             page.evaluate("localStorage.clear()")
             page.reload(wait_until="networkidle")
             page.screenshot(path=EVIDENCE / "entrevistas-home.png", full_page=True)
@@ -160,6 +162,13 @@ def main() -> int:
             assert_consent_layout(page)
             page.evaluate("window.scrollTo(0, 0)")
             page.screenshot(path=EVIDENCE / "entrevistas-consentimento-validacao-mobile.png", full_page=True)
+            page.locator('label[for="submission-consent"]').click()
+            assert page.locator("#submission-consent").is_checked()
+            assert page.locator("#form-error").is_hidden()
+            page.locator("#next-question").click()
+            assert page.locator("#question-host").is_visible()
+            page.locator("#previous-question").click()
+            assert page.locator("#setup-step").is_visible()
             page.locator("#back-home").click()
             page.evaluate("localStorage.clear()")
             page.set_viewport_size({"width": 1440, "height": 1000})

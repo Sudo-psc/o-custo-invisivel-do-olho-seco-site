@@ -1,4 +1,5 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -21,4 +22,14 @@ for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "as
 const configPath = resolve(output, "entrevistas", "config.js");
 await readFile(configPath, "utf8");
 await writeFile(configPath, `window.INTERVIEW_API_URL = ${JSON.stringify(apiUrl)};\n`, "utf8");
+
+const interviewPath = resolve(output, "entrevistas");
+const interviewIndexPath = resolve(interviewPath, "index.html");
+let interviewIndex = await readFile(interviewIndexPath, "utf8");
+for (const asset of ["styles.css", "data.js", "config.js", "app.js"]) {
+  const content = await readFile(resolve(interviewPath, asset));
+  const version = createHash("sha256").update(content).digest("hex").slice(0, 12);
+  interviewIndex = interviewIndex.replace(`\"${asset}\"`, `\"${asset}?v=${version}\"`);
+}
+await writeFile(interviewIndexPath, interviewIndex, "utf8");
 console.log(`APROVA: artefato Pages gerado em ${output}`);
