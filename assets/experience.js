@@ -51,6 +51,7 @@
   const num = (id) => Number($(id) && $(id).value ? $(id).value : 0);
 
   function animateTo(el, target, fmt) {
+    if (!el) return;
     if (root.classList.contains("calm") || !Number.isFinite(target)) { el.textContent = fmt(target); return; }
     const start = performance.now(), dur = 650;
     function tick(now) {
@@ -66,12 +67,18 @@
     const capacity = n * c * (p / 100) * (l / 100);
     const threshold = capacity > 0 && k > 0 ? k / capacity : null;
     const capEl = $("out-capacity");
-    if (capacity > 0) animateTo(capEl, capacity, (v) => money.format(v));
-    else capEl.textContent = "indisponível";
-    $("out-threshold").textContent = threshold !== null
-      ? `${(threshold * 100).toFixed(1).replace(".", ",")}%`
-      : "indisponível";
-    $("out-roi").textContent = "indisponível antes de benefício incremental, atribuível e auditável.";
+    if (capEl) {
+      if (capacity > 0) animateTo(capEl, capacity, (v) => money.format(v));
+      else capEl.textContent = "indisponível";
+    }
+    const thrEl = $("out-threshold");
+    if (thrEl) {
+      thrEl.textContent = threshold !== null
+        ? `${(threshold * 100).toFixed(1).replace(".", ",")}%`
+        : "indisponível";
+    }
+    const roiEl = $("out-roi");
+    if (roiEl) roiEl.textContent = "indisponível antes de benefício incremental, atribuível e auditável.";
     track("capacity_calculation", { inputs_complete: capacity > 0 && k > 0 });
   }
 

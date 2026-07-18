@@ -167,6 +167,7 @@
   let heroVisible = true;
   let rafId = 0;
   let last = 0, elapsed = 0, nextAutoBlink = 2600;
+  let canvasRect = null; // cacheado: o canvas é fixed, só muda no resize
 
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -176,12 +177,14 @@
       canvas.width = w; canvas.height = h;
       gl.viewport(0, 0, w, h);
     }
+    canvasRect = canvas.getBoundingClientRect();
   }
 
   function pointerMove(clientX, clientY) {
-    const rect = canvas.getBoundingClientRect();
-    pointer.tx = (clientX - rect.left) / rect.width;
-    pointer.ty = 1 - (clientY - rect.top) / rect.height;
+    if (!api.running) return; // modo calmo/pausado: nada a fazer
+    if (!canvasRect) canvasRect = canvas.getBoundingClientRect();
+    pointer.tx = (clientX - canvasRect.left) / canvasRect.width;
+    pointer.ty = 1 - (clientY - canvasRect.top) / canvasRect.height;
     blink = Math.min(1, blink + 0.12);
   }
 
