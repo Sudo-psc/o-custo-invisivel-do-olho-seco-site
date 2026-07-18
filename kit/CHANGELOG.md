@@ -1,5 +1,11 @@
 # Changelog da biblioteca
 
+## 2.9.28 — 2026-07-18
+
+- comparador ausente descrito como limite do desenho, sem inferir não superioridade;
+- checklist mede reflexo incapacitante e condiciona tratamento ou película antirreflexo;
+- companion, amostra, kit e hashes sincronizados com a candidata v2.9.28.
+
 ## 2.9.27 — 2026-07-18
 
 - kit, amostra e página de compatibilidade sincronizados com a candidata v2.9.27;

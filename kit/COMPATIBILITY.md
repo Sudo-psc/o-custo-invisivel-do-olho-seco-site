@@ -1,12 +1,12 @@
-# Compatibilidade — livro v2.9.27
+# Compatibilidade — livro v2.9.28
 
-- Livro-fonte: commit-base `ab6dc5847bd76cac2f18e3ea19ae8960b4f81382`, candidata editorial em working tree.
-- PDF digital (178 páginas): SHA-256 `e72acf280057326f613d384023bf3d648114e9d95611489d28cd2074746247bc`.
-- Amostra de 30 páginas: SHA-256 `51934d84ff0b13bf6c7b502b5f44875b4128b3e46ed3db6da3a04d1506f23580`.
-- Kit editável: conteúdo v2.9.27, SHA-256 `93d176e6f36f8ed37319679af0c9a95edc55634772799f713f104e1b4755c7a9`.
+- Livro-fonte: commit `17de527634368a8ccf7b6eafd817c097dbb64d6b`, candidato comprometido e publicado em `origin/master`.
+- PDF digital (178 páginas): SHA-256 `36210e9d16682769a8cc8fb74f446de6b388b84e328c7c61190a274d28051702`.
+- Amostra de 30 páginas: SHA-256 `c119b556c939b2af6392e5e506546d1009c389f9ebef721a4c8d6dba1e02968b`.
+- Kit editável: conteúdo v2.9.28, SHA-256 `67bf2bbcc8090cfc50058ee269ae59293acd2158377e48c8759b079134eaa465`.
 
-A v2.9.27 corrige a sustentação científica da passagem ergonômica do Capítulo 12,
-separa referências citadas de fontes consultadas e migra os QR para esta superfície
-editorial neutra e versionada.
+A v2.9.28 explicita que o estudo dos lembretes não teve comparador de orientação
+verbal e passa a medir reflexo incapacitante sem prescrever tratamento antirreflexo
+como requisito universal.
 
 Capacidade equivalente não é caixa; ROI permanece retrospectivo e depende de benefício incremental, atribuível e auditável.

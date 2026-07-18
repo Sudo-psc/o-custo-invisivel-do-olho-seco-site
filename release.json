@@ -1,19 +1,19 @@
 {
   "schema": "book-landing-release/v1",
-  "book_version": "2.9.27",
-  "source_commit": "ab6dc5847bd76cac2f18e3ea19ae8960b4f81382",
-  "source_state": "working_tree_candidate",
-  "source_pdf_sha256": "e72acf280057326f613d384023bf3d648114e9d95611489d28cd2074746247bc",
+  "book_version": "2.9.28",
+  "source_commit": "17de527634368a8ccf7b6eafd817c097dbb64d6b",
+  "source_state": "committed_candidate",
+  "source_pdf_sha256": "36210e9d16682769a8cc8fb74f446de6b388b84e328c7c61190a274d28051702",
   "sample": {
-    "path": "assets/amostra-v2.9.27.pdf",
+    "path": "assets/amostra-v2.9.28.pdf",
     "pages": 30,
-    "sha256": "51934d84ff0b13bf6c7b502b5f44875b4128b3e46ed3db6da3a04d1506f23580"
+    "sha256": "c119b556c939b2af6392e5e506546d1009c389f9ebef721a4c8d6dba1e02968b"
   },
   "kit": {
-    "path": "assets/kit-execucao-v2.9.27.zip",
-    "content_version": "2.9.27",
-    "compatible_with": "2.9.27",
-    "sha256": "93d176e6f36f8ed37319679af0c9a95edc55634772799f713f104e1b4755c7a9"
+    "path": "assets/kit-execucao-v2.9.28.zip",
+    "content_version": "2.9.28",
+    "compatible_with": "2.9.28",
+    "sha256": "67bf2bbcc8090cfc50058ee269ae59293acd2158377e48c8759b079134eaa465"
   },
   "sale_state": "not_available",
   "public_promotion": false,
