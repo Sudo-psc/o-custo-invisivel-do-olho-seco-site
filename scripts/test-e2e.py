@@ -51,7 +51,7 @@ def answer(page, kind: str, option_index: int) -> None:
     assert page.locator("#progress-percent").inner_text() == "0%"
     page.locator("#participant-code").fill("QA-LEITOR-01")
     page.locator("#participant-role").select_option(label="CEO, direção ou conselho")
-    page.locator("#submission-consent").check()
+    page.locator("#participation-confirmation").check()
     page.locator("#next-question").click()
     assert page.locator("#setup-step").is_hidden()
     assert page.locator("#question-host").is_visible()
@@ -69,9 +69,9 @@ def answer(page, kind: str, option_index: int) -> None:
 
 
 def assert_consent_layout(page) -> None:
-    row = page.locator(".consent-row").bounding_box()
-    checkbox = page.locator("#submission-consent").bounding_box()
-    copy = page.locator(".consent-row span").bounding_box()
+    row = page.locator(".participation-row").bounding_box()
+    checkbox = page.locator("#participation-confirmation").bounding_box()
+    copy = page.locator(".participation-row span").bounding_box()
     assert row and checkbox and copy
     assert 16 <= checkbox["width"] <= 22, checkbox
     assert 16 <= checkbox["height"] <= 22, checkbox
@@ -109,6 +109,8 @@ def main() -> int:
             page.set_viewport_size({"width": 1440, "height": 1000})
 
             page.locator('[data-start="pre"]').click()
+            page.add_style_tag(content=".consent-panel,.consent-row,#submission-consent{display:none!important}")
+            assert page.locator(".participation-confirmation").is_visible()
             assert page.locator("#setup-step").is_visible()
             assert_consent_layout(page)
             page.wait_for_timeout(300)
@@ -120,7 +122,7 @@ def main() -> int:
             assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
             page.screenshot(path=EVIDENCE / "entrevistas-consentimento-mobile.png", full_page=True)
             page.locator("#participant-code").fill("QA-MOBILE-01")
-            page.locator("#submission-consent").check()
+            page.locator("#participation-confirmation").check()
             page.locator("#next-question").click()
             assert page.locator("#question-host").is_visible()
             assert page.locator("#progress-steps .is-current").inner_text() == "1"
@@ -155,15 +157,15 @@ def main() -> int:
             assert page.locator("#question-host").is_visible()
             page.locator("#next-question").click()
             assert page.locator("#setup-step").is_visible()
-            assert page.locator(".consent-panel.has-error").is_visible()
+            assert page.locator(".participation-confirmation.has-error").is_visible()
             assert "Confirme o consentimento" in page.locator("#form-error").inner_text()
             page.wait_for_timeout(120)
-            assert page.evaluate("document.activeElement.id") == "submission-consent"
+            assert page.evaluate("document.activeElement.id") == "participation-confirmation"
             assert_consent_layout(page)
             page.evaluate("window.scrollTo(0, 0)")
             page.screenshot(path=EVIDENCE / "entrevistas-consentimento-validacao-mobile.png", full_page=True)
-            page.locator('label[for="submission-consent"]').click()
-            assert page.locator("#submission-consent").is_checked()
+            page.locator('label[for="participation-confirmation"]').click()
+            assert page.locator("#participation-confirmation").is_checked()
             assert page.locator("#form-error").is_hidden()
             page.locator("#next-question").click()
             assert page.locator("#question-host").is_visible()

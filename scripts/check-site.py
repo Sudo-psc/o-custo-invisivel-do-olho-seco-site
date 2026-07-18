@@ -77,12 +77,16 @@ for forbidden in ("notion", "envio", "enviad"):
 styles = (ROOT / "entrevistas/styles.css").read_text()
 for needle in (
     '.identity-card input:not([type="checkbox"])',
-    '.consent-row input[type="checkbox"]',
+    '.participation-row input[type="checkbox"]',
     "min-width: 18px",
-    ".consent-row span",
+    ".participation-row span",
     "overflow-wrap: anywhere",
 ):
     if needle not in styles: fail(f"regressão no layout do consentimento: {needle}")
+
+public_selectors = app + (ROOT / "entrevistas/index.html").read_text() + styles
+for blocked_selector in ("consent-panel", "consent-row", "submission-consent"):
+    if blocked_selector in public_selectors: fail(f"seletor vulnerável a extensão de privacidade: {blocked_selector}")
 
 api = (ROOT / "api/responses.js").read_text()
 for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):

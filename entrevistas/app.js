@@ -19,8 +19,8 @@
     surveyDescription: document.getElementById("survey-description"),
     participantCode: document.getElementById("participant-code"),
     participantRole: document.getElementById("participant-role"),
-    submissionConsent: document.getElementById("submission-consent"),
-    consentPanel: document.querySelector(".consent-panel"),
+    participationConfirmation: document.getElementById("participation-confirmation"),
+    participationPanel: document.querySelector(".participation-confirmation"),
     setupStep: document.getElementById("setup-step"),
     progressText: document.getElementById("progress-text"),
     progressPercent: document.getElementById("progress-percent"),
@@ -117,8 +117,8 @@
   function clearError() {
     elements.formError.hidden = true;
     elements.formError.textContent = "";
-    elements.consentPanel.classList.remove("has-error");
-    elements.submissionConsent.removeAttribute("aria-invalid");
+    elements.participationPanel.classList.remove("has-error");
+    elements.participationConfirmation.removeAttribute("aria-invalid");
     elements.participantCode.closest(".field-group")?.classList.remove("has-error");
     elements.participantCode.removeAttribute("aria-invalid");
   }
@@ -178,7 +178,7 @@
     elements.surveyDescription.textContent = set.description;
     elements.participantCode.value = state.participantCode;
     elements.participantRole.value = state.participantRole;
-    elements.submissionConsent.checked = Boolean(state.consent);
+    elements.participationConfirmation.checked = Boolean(state.consent);
     elements.draftStatus.textContent = state.savedAt ? "Rascunho recuperado" : "Rascunho local";
     showScreen("survey");
     renderStep();
@@ -379,7 +379,7 @@
   function validateCurrentStep() {
     state.participantCode = elements.participantCode.value.trim();
     state.participantRole = elements.participantRole.value;
-    state.consent = elements.submissionConsent.checked;
+    state.consent = elements.participationConfirmation.checked;
     if (!state.participantCode) {
       return showSetupError(
         "Informe um código do participante para permitir a comparação entre as etapas.",
@@ -397,8 +397,8 @@
     if (!state.consent) {
       return showSetupError(
         "Confirme o consentimento para participar da entrevista editorial.",
-        elements.submissionConsent,
-        elements.consentPanel
+        elements.participationConfirmation,
+        elements.participationPanel
       );
     }
     if (!state.setupComplete) return true;
@@ -701,8 +701,8 @@
     saveDraft();
   });
 
-  elements.submissionConsent.addEventListener("change", () => {
-    state.consent = elements.submissionConsent.checked;
+  elements.participationConfirmation.addEventListener("change", () => {
+    state.consent = elements.participationConfirmation.checked;
     saveDraft();
     clearError();
   });

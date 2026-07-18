@@ -150,7 +150,7 @@ summary:focus-visible {
   box-shadow: 0 0 0 4px rgba(36, 164, 109, 0.12);
 }
 
-.consent-row {
+.participation-row {
   display: flex !important;
   align-items: flex-start;
   gap: 10px;
@@ -161,7 +161,7 @@ summary:focus-visible {
   cursor: pointer;
 }
 
-.consent-row input[type="checkbox"] {
+.participation-row input[type="checkbox"] {
   appearance: none;
   width: 18px;
   min-width: 18px;
@@ -180,12 +180,12 @@ summary:focus-visible {
   transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
-.consent-row input[type="checkbox"]:hover {
+.participation-row input[type="checkbox"]:hover {
   border-color: var(--blue-600);
   box-shadow: 0 0 0 4px rgba(39, 130, 196, 0.1);
 }
 
-.consent-row input[type="checkbox"]:checked {
+.participation-row input[type="checkbox"]:checked {
   background-color: var(--blue-600);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.4' d='m3 8 3 3 7-7'/%3E%3C/svg%3E");
   background-position: center;
@@ -194,7 +194,7 @@ summary:focus-visible {
   border-color: var(--blue-600);
 }
 
-.consent-row span {
+.participation-row span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -693,7 +693,7 @@ h3 {
   font-size: 0.75rem;
 }
 
-.consent-panel {
+.participation-confirmation {
   grid-column: 1 / -1;
   padding: 16px 18px;
   background: white;
@@ -702,13 +702,13 @@ h3 {
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
-.consent-panel.has-error {
+.participation-confirmation.has-error {
   background: #fff6f6;
   border-color: #d86a6a;
   box-shadow: 0 0 0 4px rgba(168, 59, 59, 0.1);
 }
 
-.consent-panel.has-error .consent-row input[type="checkbox"] {
+.participation-confirmation.has-error .participation-row input[type="checkbox"] {
   border-color: var(--danger);
   box-shadow: 0 0 0 4px rgba(168, 59, 59, 0.12);
 }
@@ -718,11 +718,11 @@ h3 {
   box-shadow: 0 0 0 4px rgba(168, 59, 59, 0.1) !important;
 }
 
-.consent-panel .consent-row {
+.participation-confirmation .participation-row {
   margin-top: 0;
 }
 
-.consent-panel > p {
+.participation-confirmation > p {
   margin: 8px 0 0 28px;
 }
 
@@ -1212,7 +1212,7 @@ h3 {
     padding: 18px;
   }
 
-  .consent-panel {
+  .participation-confirmation {
     grid-column: auto;
     padding: 15px;
   }
