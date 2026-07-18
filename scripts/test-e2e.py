@@ -46,9 +46,16 @@ class Handler(SimpleHTTPRequestHandler):
 
 def answer(page, kind: str, option_index: int) -> None:
     page.locator(f'[data-start="{kind}"]').click()
+    assert page.locator("#setup-step").is_visible()
+    assert page.locator("#question-host").is_hidden()
+    assert page.locator("#progress-percent").inner_text() == "0%"
     page.locator("#participant-code").fill("QA-LEITOR-01")
     page.locator("#participant-role").select_option(label="CEO, direção ou conselho")
     page.locator("#submission-consent").check()
+    page.locator("#next-question").click()
+    assert page.locator("#setup-step").is_hidden()
+    assert page.locator("#question-host").is_visible()
+    assert page.locator("#progress-percent").inner_text() == "13%"
     for index in range(8):
         if kind == "pre" and index == 0:
             page.locator('.option-label input[value="E"]').check()
@@ -95,13 +102,35 @@ def main() -> int:
             page.evaluate("localStorage.clear()")
             page.reload(wait_until="networkidle")
             page.screenshot(path=EVIDENCE / "entrevistas-home.png", full_page=True)
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.screenshot(path=EVIDENCE / "entrevistas-home-mobile.png", full_page=True)
+            page.set_viewport_size({"width": 1440, "height": 1000})
 
             page.locator('[data-start="pre"]').click()
+            assert page.locator("#setup-step").is_visible()
             assert_consent_layout(page)
+            page.wait_for_timeout(300)
             page.screenshot(path=EVIDENCE / "entrevistas-consentimento-desktop.png", full_page=True)
             page.set_viewport_size({"width": 390, "height": 844})
             assert_consent_layout(page)
+            assert page.locator("#setup-step").is_visible()
+            assert page.locator("#question-host").is_hidden()
+            assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
             page.screenshot(path=EVIDENCE / "entrevistas-consentimento-mobile.png", full_page=True)
+            page.locator("#participant-code").fill("QA-MOBILE-01")
+            page.locator("#submission-consent").check()
+            page.locator("#next-question").click()
+            assert page.locator("#question-host").is_visible()
+            assert page.locator("#progress-steps .is-current").inner_text() == "1"
+            assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
+            for option in page.locator(".option-label").all():
+                bounds = option.bounding_box()
+                assert bounds and bounds["width"] >= 44 and bounds["height"] >= 44
+            page.wait_for_timeout(300)
+            page.evaluate("window.scrollTo(0, 0)")
+            page.screenshot(path=EVIDENCE / "entrevistas-pergunta-mobile.png", full_page=True)
+            page.locator("#previous-question").click()
+            assert page.locator("#setup-step").is_visible()
             page.set_viewport_size({"width": 1440, "height": 1000})
             page.locator("#back-home").click()
 
@@ -111,6 +140,7 @@ def main() -> int:
             answer(page, "post", 1)
             assert page.locator("#comparison-card").is_visible()
             assert page.locator("#answer-preview-content .answer-item").count() == 8
+            page.wait_for_timeout(300)
             page.screenshot(path=EVIDENCE / "entrevistas-resultado.png", full_page=True)
             assert len(page.evaluate("JSON.parse(localStorage.getItem('ocioso-interview-completions-v1'))")) == 2
             assert not errors, errors

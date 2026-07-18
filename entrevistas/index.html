@@ -105,27 +105,19 @@
             <h1 id="survey-title"></h1>
             <p id="survey-description"></p>
 
-            <div class="identity-card">
-              <label for="participant-code">Código do participante <span aria-hidden="true">*</span></label>
-              <input id="participant-code" name="participant-code" type="text" minlength="3" maxlength="32" pattern="[A-Za-z0-9_-]{3,32}" autocomplete="off" placeholder="Ex.: LEITOR-07" required>
-              <p>Use o mesmo código nas duas etapas. Não informe seu nome completo.</p>
-
-              <label for="participant-role">Área de atuação</label>
-              <select id="participant-role" name="participant-role">
-                <option value="">Prefiro não informar</option>
-                <option>CEO, direção ou conselho</option>
-                <option>CFO, finanças ou controladoria</option>
-                <option>RH, People ou saúde ocupacional</option>
-                <option>Tecnologia, operações, QA ou dados</option>
-                <option>Saúde ou oftalmologia</option>
-                <option>Outra área</option>
-              </select>
-
-              <label class="consent-row" for="submission-consent">
-                <input id="submission-consent" name="submission-consent" type="checkbox" required>
-                <span>Concordo em participar desta entrevista editorial.</span>
-              </label>
-              <p>Não informe dados pessoais ou de saúde.</p>
+            <div class="survey-guide" aria-label="Etapas da entrevista">
+              <div>
+                <span aria-hidden="true">1</span>
+                <p><strong>Identifique</strong><small>Crie um código curto.</small></p>
+              </div>
+              <div>
+                <span aria-hidden="true">2</span>
+                <p><strong>Responda</strong><small>Escolha uma opção por vez.</small></p>
+              </div>
+              <div>
+                <span aria-hidden="true">3</span>
+                <p><strong>Conclua</strong><small>Revise ou baixe seu resumo.</small></p>
+              </div>
             </div>
 
             <div class="progress-block" aria-label="Progresso da entrevista">
@@ -133,16 +125,52 @@
                 <span id="progress-text">Pergunta 1 de 8</span>
                 <strong id="progress-percent">13%</strong>
               </div>
-              <div class="progress-track"><span id="progress-bar"></span></div>
+              <div class="progress-track" id="progress-track" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-bar"></span></div>
+              <ol class="progress-steps" id="progress-steps" aria-label="Oito perguntas"></ol>
             </div>
           </aside>
 
           <form class="question-card" id="interview-form" novalidate>
-            <div id="question-host"></div>
+            <section class="setup-step" id="setup-step" aria-labelledby="setup-title">
+              <p class="question-index">Antes de começar</p>
+              <h2 id="setup-title">Prepare sua entrevista</h2>
+              <p class="setup-lead">Você levará cerca de cinco minutos. O código permite relacionar as duas etapas sem usar seu nome.</p>
+
+              <div class="identity-card">
+                <div class="field-group field-code">
+                  <label for="participant-code">Código do participante <span aria-hidden="true">*</span></label>
+                  <input id="participant-code" name="participant-code" type="text" minlength="3" maxlength="32" pattern="[A-Za-z0-9_-]{3,32}" autocomplete="off" placeholder="Ex.: LEITOR-07" aria-describedby="participant-code-help" required>
+                  <p id="participant-code-help">Use o mesmo código nas duas etapas. Não informe seu nome completo.</p>
+                </div>
+
+                <div class="field-group field-role">
+                  <label for="participant-role">Área de atuação <span class="optional-label">Opcional</span></label>
+                  <select id="participant-role" name="participant-role">
+                    <option value="">Prefiro não informar</option>
+                    <option>CEO, direção ou conselho</option>
+                    <option>CFO, finanças ou controladoria</option>
+                    <option>RH, People ou saúde ocupacional</option>
+                    <option>Tecnologia, operações, QA ou dados</option>
+                    <option>Saúde ou oftalmologia</option>
+                    <option>Outra área</option>
+                  </select>
+                </div>
+
+                <div class="consent-panel">
+                  <label class="consent-row" for="submission-consent">
+                    <input id="submission-consent" name="submission-consent" type="checkbox" aria-describedby="consent-help" required>
+                    <span>Concordo em participar desta entrevista editorial.</span>
+                  </label>
+                  <p id="consent-help">Não informe dados pessoais ou de saúde.</p>
+                </div>
+              </div>
+            </section>
+
+            <div id="question-host" hidden></div>
             <p class="form-error" id="form-error" role="alert" hidden></p>
             <div class="question-actions">
-              <button class="secondary-button" id="previous-question" type="button">Voltar</button>
-              <button class="primary-button" id="next-question" type="button">Continuar <span aria-hidden="true">→</span></button>
+              <button class="secondary-button" id="previous-question" type="button" hidden>Voltar</button>
+              <button class="primary-button" id="next-question" type="button">Começar perguntas <span aria-hidden="true">→</span></button>
             </div>
           </form>
         </div>

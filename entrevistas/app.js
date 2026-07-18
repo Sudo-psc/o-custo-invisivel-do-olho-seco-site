@@ -20,9 +20,12 @@
     participantCode: document.getElementById("participant-code"),
     participantRole: document.getElementById("participant-role"),
     submissionConsent: document.getElementById("submission-consent"),
+    setupStep: document.getElementById("setup-step"),
     progressText: document.getElementById("progress-text"),
     progressPercent: document.getElementById("progress-percent"),
+    progressTrack: document.getElementById("progress-track"),
     progressBar: document.getElementById("progress-bar"),
+    progressSteps: document.getElementById("progress-steps"),
     questionHost: document.getElementById("question-host"),
     previous: document.getElementById("previous-question"),
     next: document.getElementById("next-question"),
@@ -56,6 +59,7 @@
       participantCode: "",
       participantRole: "",
       consent: false,
+      setupComplete: false,
       startedAt: new Date().toISOString(),
       answers: {},
       finalComment: ""
@@ -118,11 +122,13 @@
     const drafts = readStore(DRAFT_KEY);
     const draft = drafts[type];
     if (!draft || draft.type !== type) return emptyState(type);
+    const answers = draft.answers || {};
     return {
       ...emptyState(type),
       ...draft,
       step: Math.min(Math.max(Number(draft.step) || 0, 0), 8),
-      answers: draft.answers || {}
+      setupComplete: Boolean(draft.setupComplete || Object.keys(answers).length || Number(draft.step) > 0),
+      answers
     };
   }
 
@@ -155,28 +161,68 @@
     elements.draftStatus.textContent = state.savedAt ? "Rascunho recuperado" : "Rascunho local";
     showScreen("survey");
     renderStep();
-    elements.participantCode.focus({ preventScroll: true });
+    focusActiveStep(false);
   }
 
   function renderStep() {
     clearError();
     const set = sets[state.type];
     const total = set.questions.length;
-    const isComment = state.step === total;
+    const isSetup = !state.setupComplete;
+    const isComment = !isSetup && state.step === total;
     const shownStep = isComment ? total : state.step + 1;
-    const percent = isComment ? 100 : Math.round((shownStep / total) * 100);
+    const percent = isSetup ? 0 : (isComment ? 100 : Math.round((shownStep / total) * 100));
 
-    elements.progressText.textContent = isComment ? "Comentário opcional" : `Pergunta ${shownStep} de ${total}`;
+    elements.progressText.textContent = isSetup ? "Preparação" : (isComment ? "Comentário opcional" : `Pergunta ${shownStep} de ${total}`);
     elements.progressPercent.textContent = `${percent}%`;
     elements.progressBar.style.width = `${percent}%`;
-    elements.previous.disabled = state.step === 0;
-    elements.next.innerHTML = isComment ? "Concluir entrevista <span aria-hidden=\"true\">✓</span>" : "Continuar <span aria-hidden=\"true\">→</span>";
+    elements.progressTrack.setAttribute("aria-valuenow", String(percent));
+    elements.previous.hidden = isSetup;
+    elements.previous.disabled = isSetup;
+    elements.next.innerHTML = isSetup
+      ? "Começar perguntas <span aria-hidden=\"true\">→</span>"
+      : (isComment ? "Concluir entrevista <span aria-hidden=\"true\">✓</span>" : "Continuar <span aria-hidden=\"true\">→</span>");
+    elements.setupStep.hidden = !isSetup;
+    elements.questionHost.hidden = isSetup;
+    elements.form.dataset.phase = isSetup ? "setup" : (isComment ? "comment" : "question");
+    renderProgressSteps(total, isSetup, isComment);
+
+    if (isSetup) {
+      elements.questionHost.replaceChildren();
+      return;
+    }
 
     if (isComment) {
       renderFinalComment(set);
     } else {
       renderQuestion(set.questions[state.step], state.step, total);
     }
+  }
+
+  function renderProgressSteps(total, isSetup, isComment) {
+    elements.progressSteps.replaceChildren();
+    for (let index = 0; index < total; index += 1) {
+      const item = document.createElement("li");
+      const isComplete = isComment || (!isSetup && index < state.step);
+      const isCurrent = !isSetup && !isComment && index === state.step;
+      item.textContent = String(index + 1);
+      item.className = isComplete ? "is-complete" : (isCurrent ? "is-current" : "");
+      item.setAttribute("aria-label", isComplete ? `Pergunta ${index + 1} concluída` : `Pergunta ${index + 1}`);
+      if (isCurrent) item.setAttribute("aria-current", "step");
+      elements.progressSteps.appendChild(item);
+    }
+  }
+
+  function focusActiveStep(scroll = true) {
+    window.setTimeout(() => {
+      if (scroll && window.matchMedia("(max-width: 900px)").matches) {
+        elements.form.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      const target = state.setupComplete
+        ? elements.questionHost.querySelector("legend, label, textarea")
+        : elements.participantCode;
+      target?.focus({ preventScroll: true });
+    }, 80);
   }
 
   function renderQuestion(question, index, total) {
@@ -190,6 +236,7 @@
     fieldset.className = "question-fieldset";
     const legend = document.createElement("legend");
     legend.textContent = question.prompt;
+    legend.tabIndex = -1;
     fieldset.appendChild(legend);
 
     const options = document.createElement("div");
@@ -212,13 +259,23 @@
     otherInput.maxLength = 800;
     otherInput.value = current?.choice === "E" ? current.text || "" : "";
     otherInput.setAttribute("aria-label", "Outra resposta em texto");
+    const otherMeta = document.createElement("div");
+    otherMeta.className = "input-meta";
+    const otherHint = document.createElement("span");
+    otherHint.textContent = "Resposta em texto";
+    const otherCount = document.createElement("span");
+    otherCount.textContent = `${otherInput.value.length}/800`;
+    otherMeta.append(otherHint, otherCount);
     otherInput.addEventListener("focus", () => {
       const radio = otherLabel.querySelector("input");
       radio.checked = true;
       updateAnswer(question, "E", otherInput.value);
     });
-    otherInput.addEventListener("input", () => updateAnswer(question, "E", otherInput.value));
-    otherWrap.append(otherLabel, otherInput);
+    otherInput.addEventListener("input", () => {
+      otherCount.textContent = `${otherInput.value.length}/800`;
+      updateAnswer(question, "E", otherInput.value);
+    });
+    otherWrap.append(otherLabel, otherInput, otherMeta);
     options.appendChild(otherWrap);
 
     fieldset.appendChild(options);
@@ -273,6 +330,7 @@
     const label = document.createElement("label");
     label.htmlFor = "final-comment";
     label.textContent = set.finalPrompt;
+    label.tabIndex = -1;
 
     const input = document.createElement("textarea");
     input.id = "final-comment";
@@ -280,14 +338,21 @@
     input.maxLength = 1200;
     input.placeholder = "Se desejar, acrescente uma frase final.";
     input.value = state.finalComment;
+    const inputMeta = document.createElement("div");
+    inputMeta.className = "input-meta";
+    const inputHint = document.createElement("span");
+    inputHint.textContent = "Comentário opcional";
+    const inputCount = document.createElement("span");
+    inputCount.textContent = `${input.value.length}/1200`;
+    inputMeta.append(inputHint, inputCount);
     input.addEventListener("input", () => {
       state.finalComment = input.value;
+      inputCount.textContent = `${input.value.length}/1200`;
       saveDraft();
     });
 
-    wrap.append(indexLabel, label, input);
+    wrap.append(indexLabel, label, input, inputMeta);
     elements.questionHost.appendChild(wrap);
-    window.setTimeout(() => input.focus(), 80);
   }
 
   function validateCurrentStep() {
@@ -309,6 +374,7 @@
       elements.submissionConsent.focus();
       return false;
     }
+    if (!state.setupComplete) return true;
 
     const set = sets[state.type];
     if (state.step >= set.questions.length) return true;
@@ -329,24 +395,36 @@
   function nextStep() {
     if (!validateCurrentStep()) return;
     const total = sets[state.type].questions.length;
+    if (!state.setupComplete) {
+      state.setupComplete = true;
+      saveDraft();
+      renderStep();
+      focusActiveStep();
+      return;
+    }
     if (state.step < total) {
       state.step += 1;
       saveDraft();
       renderStep();
-      elements.questionHost.querySelector("input, textarea")?.focus({ preventScroll: true });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      focusActiveStep();
       return;
     }
     completeInterview();
   }
 
   function previousStep() {
-    if (state.step === 0) return;
+    if (!state.setupComplete) return;
+    if (state.step === 0) {
+      state.setupComplete = false;
+      saveDraft();
+      renderStep();
+      focusActiveStep();
+      return;
+    }
     state.step -= 1;
     saveDraft();
     renderStep();
-    elements.questionHost.querySelector("input, textarea")?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    focusActiveStep();
   }
 
   function makeSubmissionId() {
@@ -580,7 +658,10 @@
   elements.finishHome.addEventListener("click", returnHome);
   elements.next.addEventListener("click", nextStep);
   elements.previous.addEventListener("click", previousStep);
-  elements.form.addEventListener("submit", (event) => event.preventDefault());
+  elements.form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    nextStep();
+  });
 
   elements.participantCode.addEventListener("input", () => {
     state.participantCode = elements.participantCode.value;
