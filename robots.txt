@@ -1,0 +1,8 @@
+# O Custo Invisível do Olho Seco — pré-lançamento sem venda ativa.
+# A página permanece fora dos índices enquanto o contrato comercial não mudar
+# (ver README.md e scripts/check-site.py, que exigem noindex,nofollow no HTML).
+#
+# Ao abrir para indexação, trocar este arquivo por uma política de rastreio
+# aberta, remover o meta noindex e publicar o sitemap.xml.
+User-agent: *
+Disallow: /
