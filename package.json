@@ -1,0 +1,12 @@
+{
+  "name": "o-custo-invisivel-do-olho-seco-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:pages": "node scripts/build-pages.mjs",
+    "check": "python3 scripts/check-site.py && node --check entrevistas/app.js && node --check api/responses.js && node scripts/test-api.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

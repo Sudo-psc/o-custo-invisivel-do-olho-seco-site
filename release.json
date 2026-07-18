@@ -1,0 +1,42 @@
+{
+  "schema": "book-landing-release/v1",
+  "book_version": "2.9.26",
+  "source_commit": "ab6dc5847bd76cac2f18e3ea19ae8960b4f81382",
+  "sample": {
+    "path": "assets/amostra-v2.9.26.pdf",
+    "pages": 30,
+    "sha256": "97db922ee16932aec76b42d865d805c607a7238744c8052a15b3c2acfc2ffacb"
+  },
+  "kit": {
+    "path": "assets/kit-execucao-v2.9.26.zip",
+    "content_version": "2.9.26",
+    "compatible_with": "2.9.26",
+    "sha256": "b6fe164dcecb4bc1a120b835061fc46048403ae90956e6e65f78993a44c92b3a"
+  },
+  "sale_state": "not_available",
+  "public_promotion": false,
+  "formats": [],
+  "price": null,
+  "channel": null,
+  "checkout_url": null,
+  "planned_channels": [
+    "Amazon Kindle/KDP",
+    "Apple Books",
+    "Google Play Livros",
+    "landing própria",
+    "Clube de Autores"
+  ],
+  "pricing_recommendation_brl": {
+    "ebook": 39.90,
+    "paperback_bw": 89.90,
+    "paperback_color": 129.90,
+    "status": "recommended_pending_platform_cost_validation"
+  },
+  "analytics_provider": null,
+  "interviews": {
+    "questionnaire_version": "1.0.0",
+    "notion_database_url": "https://app.notion.com/p/6221fadd68684819bd7271ea4349fa78",
+    "data_collection": "editorial_responses_only"
+  },
+  "updated_at": "2026-07-18"
+}

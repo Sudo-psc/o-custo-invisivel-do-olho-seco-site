@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0b2d49">
+  <meta name="description" content="Entrevistas de pré-leitura e pós-leitura de O Custo Invisível do Olho Seco.">
+  <title>Entrevistas do livro · O Custo Invisível do Olho Seco</title>
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <button class="brand-button" id="home-button" type="button" aria-label="Voltar ao início">
+        <img src="../assets/brand-icon.svg" width="42" height="42" alt="">
+        <span>
+          <strong>O Custo Invisível do Olho Seco</strong>
+          <small>Escuta de leitores</small>
+        </span>
+      </button>
+      <div class="privacy-pill" title="O token do Notion permanece protegido no servidor">
+        <span class="privacy-dot" aria-hidden="true"></span>
+        Envio seguro ao Notion
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="screen home-screen" id="home-screen">
+      <div class="shell">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Expectativa antes · percepção depois</p>
+            <h1>Duas entrevistas.<br><span>Uma leitura comparável.</span></h1>
+            <p class="hero-lead">Escolha o momento da leitura, responda oito perguntas e registre o que você esperava ou o que realmente permaneceu.</p>
+          </div>
+          <aside class="hero-note">
+            <div class="note-icon" aria-hidden="true">↔</div>
+            <p><strong>Use o mesmo código</strong> nas duas etapas para comparar expectativa e percepção sem informar seu nome.</p>
+          </aside>
+        </div>
+
+        <div class="interview-grid" aria-label="Escolha uma entrevista">
+          <article class="choice-card choice-pre">
+            <div class="choice-number">01</div>
+            <p class="eyebrow">Antes de abrir o livro</p>
+            <h2>Pré-leitura</h2>
+            <p>Associações espontâneas, expectativas, dúvidas e critérios de confiança.</p>
+            <ul class="choice-meta" aria-label="Detalhes">
+              <li>8 perguntas</li>
+              <li>≈ 5 minutos</li>
+              <li>título e tema geral</li>
+            </ul>
+            <button class="primary-button" type="button" data-start="pre">
+              Começar pré-leitura <span aria-hidden="true">→</span>
+            </button>
+          </article>
+
+          <article class="choice-card choice-post">
+            <div class="choice-number">02</div>
+            <p class="eyebrow">Depois de terminar o livro</p>
+            <h2>Pós-leitura</h2>
+            <p>Percepções finais, dúvidas remanescentes, utilidade e disposição para recomendar.</p>
+            <ul class="choice-meta" aria-label="Detalhes">
+              <li>8 perguntas</li>
+              <li>≈ 5 minutos</li>
+              <li>comparação disponível</li>
+            </ul>
+            <button class="primary-button" type="button" data-start="post">
+              Começar pós-leitura <span aria-hidden="true">→</span>
+            </button>
+          </article>
+        </div>
+
+        <section class="privacy-card" aria-labelledby="privacy-title">
+          <div>
+            <p class="eyebrow" id="privacy-title">Privacidade por padrão</p>
+            <h2>Você controla o envio das respostas.</h2>
+          </div>
+          <div class="privacy-copy">
+            <p>Rascunhos ficam somente neste navegador. Ao concluir, as respostas são enviadas por uma API protegida para uma base privada no Notion e uma cópia permanece local.</p>
+            <p>Use um código combinado, evite nome completo e não registre sintomas, diagnósticos ou outras informações individuais de saúde.</p>
+            <button class="text-button danger-text" id="clear-data" type="button">Apagar dados locais</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen survey-screen" id="survey-screen" hidden>
+      <div class="shell survey-shell">
+        <div class="survey-topline">
+          <button class="back-home" id="back-home" type="button"><span aria-hidden="true">←</span> Escolher outra entrevista</button>
+          <span class="draft-status" id="draft-status" role="status" aria-live="polite">Rascunho local</span>
+        </div>
+
+        <div class="survey-layout">
+          <aside class="survey-sidebar">
+            <p class="eyebrow" id="survey-eyebrow"></p>
+            <h1 id="survey-title"></h1>
+            <p id="survey-description"></p>
+
+            <div class="identity-card">
+              <label for="participant-code">Código do participante <span aria-hidden="true">*</span></label>
+              <input id="participant-code" name="participant-code" type="text" minlength="3" maxlength="32" pattern="[A-Za-z0-9_-]{3,32}" autocomplete="off" placeholder="Ex.: LEITOR-07" required>
+              <p>Use o mesmo código nas duas etapas. Não informe seu nome completo.</p>
+
+              <label for="participant-role">Área de atuação</label>
+              <select id="participant-role" name="participant-role">
+                <option value="">Prefiro não informar</option>
+                <option>CEO, direção ou conselho</option>
+                <option>CFO, finanças ou controladoria</option>
+                <option>RH, People ou saúde ocupacional</option>
+                <option>Tecnologia, operações, QA ou dados</option>
+                <option>Saúde ou oftalmologia</option>
+                <option>Outra área</option>
+              </select>
+
+              <label class="consent-row" for="submission-consent">
+                <input id="submission-consent" name="submission-consent" type="checkbox" required>
+                <span>Concordo com o envio destas respostas editoriais ao Notion.</span>
+              </label>
+              <p>O código e a área de atuação serão enviados; não informe dados pessoais ou de saúde.</p>
+            </div>
+
+            <div class="progress-block" aria-label="Progresso da entrevista">
+              <div class="progress-label">
+                <span id="progress-text">Pergunta 1 de 8</span>
+                <strong id="progress-percent">13%</strong>
+              </div>
+              <div class="progress-track"><span id="progress-bar"></span></div>
+            </div>
+          </aside>
+
+          <form class="question-card" id="interview-form" novalidate>
+            <div id="question-host"></div>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+            <div class="question-actions">
+              <button class="secondary-button" id="previous-question" type="button">Voltar</button>
+              <button class="primary-button" id="next-question" type="button">Continuar <span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen result-screen" id="result-screen" hidden>
+      <div class="shell result-shell">
+        <div class="success-mark" aria-hidden="true">✓</div>
+        <p class="eyebrow">Entrevista concluída</p>
+        <h1 id="result-title">Entrevista concluída</h1>
+        <p class="result-lead" id="result-lead"></p>
+
+        <div class="result-actions">
+          <button class="primary-button" id="download-text" type="button">Baixar resumo (.txt)</button>
+          <button class="secondary-button" id="download-json" type="button">Baixar dados (.json)</button>
+          <button class="secondary-button" id="copy-result" type="button">Copiar respostas</button>
+        </div>
+
+        <div class="delivery-card" id="delivery-card" aria-live="polite">
+          <span class="delivery-dot" id="delivery-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="delivery-title">Preparando envio seguro</strong>
+            <p id="delivery-message">A cópia local já está preservada.</p>
+          </div>
+          <button class="secondary-button compact-button" id="retry-submission" type="button" hidden>Tentar novamente</button>
+        </div>
+
+        <section class="comparison-card" id="comparison-card" hidden aria-labelledby="comparison-title">
+          <p class="eyebrow">Os dois momentos estão completos</p>
+          <h2 id="comparison-title">Comparação pré × pós-leitura</h2>
+          <p>Encontramos respostas de pré e pós-leitura com o mesmo código. O resumo combinado permite observar o que permaneceu e o que mudou.</p>
+          <button class="primary-button" id="download-comparison" type="button">Baixar comparação (.txt)</button>
+        </section>
+
+        <details class="answer-preview">
+          <summary>Visualizar respostas</summary>
+          <div id="answer-preview-content"></div>
+        </details>
+
+        <button class="text-button" id="finish-home" type="button">Voltar ao início</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p><strong>O Custo Invisível do Olho Seco</strong> · Entrevistas editoriais</p>
+      <p>Percepções de leitores não constituem evidência científica, endosso ou avaliação médica.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
