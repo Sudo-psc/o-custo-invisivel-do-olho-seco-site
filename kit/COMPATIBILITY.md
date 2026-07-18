@@ -1,12 +1,12 @@
-# Compatibilidade — livro v2.9.26
+# Compatibilidade — livro v2.9.27
 
-- Livro-fonte: commit `32d0abd4c7bf507138272042375c9ac9f7d450ef`.
-- PDF digital (176 páginas): SHA-256 `2ae5b4840638ee78934569a0df7ec58e275375bd40f57ddea36a4c55d637f8af`.
-- Amostra de 30 páginas: SHA-256 `c24540f8f97935e191f8990a53c24803d1c439207f2d8cd91eed62bddc6ddfd0`.
-- Kit editável: conteúdo v2.9.26, SHA-256 `9ff69183412f5061569f51c5d79e05884486daeb1a386056e74b24fc689ee6ea`.
+- Livro-fonte: commit-base `ab6dc5847bd76cac2f18e3ea19ae8960b4f81382`, candidata editorial em working tree.
+- PDF digital (178 páginas): SHA-256 `e72acf280057326f613d384023bf3d648114e9d95611489d28cd2074746247bc`.
+- Amostra de 30 páginas: SHA-256 `51934d84ff0b13bf6c7b502b5f44875b4128b3e46ed3db6da3a04d1506f23580`.
+- Kit editável: conteúdo v2.9.27, SHA-256 `93d176e6f36f8ed37319679af0c9a95edc55634772799f713f104e1b4755c7a9`.
 
-A v2.9.26 corrige a linguagem causal sobre supressão/retomada do piscar no Capítulo 13 e uma quebra
-bibliográfica (TRANCOSO VAZ/TSAI), com autorização humana registrada em
-`artifacts/evidence/2026-07-14-aprovacao-causalidade-bibliografia-v2920.md`, sobre a base v2.9.19.
+A v2.9.27 corrige a sustentação científica da passagem ergonômica do Capítulo 12,
+separa referências citadas de fontes consultadas e migra os QR para esta superfície
+editorial neutra e versionada.
 
 Capacidade equivalente não é caixa; ROI permanece retrospectivo e depende de benefício incremental, atribuível e auditável.

@@ -13,7 +13,7 @@ def fail(message: str) -> None:
     raise SystemExit(f"REPROVA: {message}")
 
 release = json.loads((ROOT / "release.json").read_text())
-if release["book_version"] != "2.9.26": fail("versão pública divergente")
+if release["book_version"] != "2.9.27": fail("versão pública divergente")
 for key in ("sample", "kit"):
     item = release[key]
     path = ROOT / item["path"]
@@ -49,4 +49,4 @@ api = (ROOT / "api/responses.js").read_text()
 for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):
     if needle not in api: fail(f"API sem {needle}")
 
-print("APROVA: site v2.9.26, amostra 30 páginas, entrevistas 8+8 e API Notion sem segredo no cliente")
+print("APROVA: site v2.9.27, amostra 30 páginas, entrevistas 8+8 e API Notion sem segredo no cliente")

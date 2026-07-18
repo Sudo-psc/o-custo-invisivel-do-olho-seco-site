@@ -1,5 +1,11 @@
 # Changelog da biblioteca
 
+## 2.9.27 — 2026-07-18
+
+- kit, amostra e página de compatibilidade sincronizados com a candidata v2.9.27;
+- QR estáveis passam a apontar para a superfície editorial neutra;
+- hashes públicos atualizados para verificação independente.
+
 ## 2.9.14 — 2026-07-13
 
 - nova promessa de decisão operacional auditável;

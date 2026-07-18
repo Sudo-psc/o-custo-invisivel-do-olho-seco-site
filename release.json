@@ -1,17 +1,19 @@
 {
   "schema": "book-landing-release/v1",
-  "book_version": "2.9.26",
+  "book_version": "2.9.27",
   "source_commit": "ab6dc5847bd76cac2f18e3ea19ae8960b4f81382",
+  "source_state": "working_tree_candidate",
+  "source_pdf_sha256": "e72acf280057326f613d384023bf3d648114e9d95611489d28cd2074746247bc",
   "sample": {
-    "path": "assets/amostra-v2.9.26.pdf",
+    "path": "assets/amostra-v2.9.27.pdf",
     "pages": 30,
-    "sha256": "97db922ee16932aec76b42d865d805c607a7238744c8052a15b3c2acfc2ffacb"
+    "sha256": "51934d84ff0b13bf6c7b502b5f44875b4128b3e46ed3db6da3a04d1506f23580"
   },
   "kit": {
-    "path": "assets/kit-execucao-v2.9.26.zip",
-    "content_version": "2.9.26",
-    "compatible_with": "2.9.26",
-    "sha256": "b6fe164dcecb4bc1a120b835061fc46048403ae90956e6e65f78993a44c92b3a"
+    "path": "assets/kit-execucao-v2.9.27.zip",
+    "content_version": "2.9.27",
+    "compatible_with": "2.9.27",
+    "sha256": "93d176e6f36f8ed37319679af0c9a95edc55634772799f713f104e1b4755c7a9"
   },
   "sale_state": "not_available",
   "public_promotion": false,
