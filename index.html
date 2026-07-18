@@ -2,116 +2,225 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#04101f">
   <title>O Custo Invisível do Olho Seco — edição v2.9.27</title>
   <meta name="description" content="Um método executivo para investigar sintomas visuais no trabalho sem fabricar causalidade ou ROI.">
-  <style>
-    :root{--navy:#082b52;--blue:#1769aa;--sky:#eaf5ff;--ink:#17212b;--muted:#52606d;--line:#d8e2ea;--paper:#fff;--bg:#f6f8fa;--warn:#fff3cd}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--blue)}
-    header,main,footer{max-width:1120px;margin:auto;padding:24px}.nav{display:flex;justify-content:space-between;gap:20px;align-items:center}.brand{font-weight:800;color:var(--navy)}
-    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:48px;padding-block:72px}.eyebrow{color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem}
-    h1,h2,h3{color:var(--navy);line-height:1.15}h1{font-size:clamp(2.5rem,6vw,4.8rem);margin:.2em 0}.lead{font-size:1.25rem;color:var(--muted)}
-    .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 8px 32px #082b5210}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-    .btn{display:inline-block;border-radius:999px;padding:12px 20px;text-decoration:none;font-weight:750;border:1px solid var(--blue)}.primary{background:var(--blue);color:#fff}.secondary{background:#fff}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.section{padding-block:52px}.role{border-top:4px solid var(--blue)}
-    label{display:block;font-weight:700;margin-top:15px}input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit}.result{background:var(--sky);padding:18px;border-radius:12px;margin-top:18px}
-    .note{font-size:.92rem;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:40px}.status{background:var(--warn);border:1px solid #f1d58a;padding:10px 14px;border-radius:10px}
-    @media(max-width:760px){.hero,.grid{grid-template-columns:1fr}.hero{padding-block:40px}}
-  </style>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/experience.css">
 </head>
 <body>
-<header><nav class="nav"><span class="brand">O Custo Invisível do Olho Seco</span><div class="actions"><a href="entrevistas/">Entrevistas</a><a href="#empresa">Para organizações</a></div></nav></header>
-<main>
-  <section class="hero">
-    <div>
-      <div class="eyebrow">Infraestrutura de decisão · edição v2.9.27</div>
-      <h1>A saúde visual merece entrar na pauta — mas só os dados da sua organização dirão por quê.</h1>
-      <p class="lead">Um método executivo para separar sintomas, capacidade, operação e caixa — e decidir se vale encerrar, ajustar ou avançar sem fabricar ROI.</p>
-      <div class="actions">
-        <a class="btn primary" href="assets/amostra-v2.9.27.pdf" data-event="sample_download">Ler amostra de 30 páginas</a>
-        <a class="btn secondary" href="entrevistas/" data-event="interviews_view">Responder entrevistas</a>
-        <a class="btn secondary" href="#empresa" data-event="b2b_route_view">Avaliar prontidão</a>
+  <!-- Superfície viva: simulação do filme lacrimal em WebGL. -->
+  <canvas id="tearfilm" aria-hidden="true"></canvas>
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap">
+      <span class="brand"><span class="dot" aria-hidden="true"></span>O Custo Invisível do Olho Seco</span>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="#custo" class="hide-sm">O custo</a>
+        <a href="#empresa" class="hide-sm">Calculadora</a>
+        <a href="entrevistas/">Entrevistas</a>
+        <a href="#empresa">Para organizações</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================================================== HERO -->
+    <section class="hero" id="topo">
+      <div class="wrap">
+        <div class="reveal">
+          <span class="eyebrow">Infraestrutura de decisão · edição v2.9.27</span>
+          <h1>A saúde visual merece entrar na pauta — mas só os <span class="shimmer">dados da sua organização</span> dirão por quê.</h1>
+          <p class="lead">Um método executivo para separar sintomas, capacidade, operação e caixa — e decidir se vale encerrar, ajustar ou avançar sem fabricar ROI.</p>
+          <div class="actions">
+            <a class="btn primary" href="assets/amostra-v2.9.27.pdf" data-event="sample_download">Ler amostra de 30 páginas</a>
+            <a class="btn" href="entrevistas/" data-event="interviews_view">Responder entrevistas</a>
+            <a class="btn ghost" href="#empresa" data-event="b2b_route_view">Avaliar prontidão</a>
+          </div>
+          <div class="status" role="note">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><strong>Disponibilidade em preparação.</strong> Canais planejados e preços sugeridos estão em validação; os links de compra ainda não estão ativos. Nenhuma venda ou pré-venda ocorre nesta página.</span>
+          </div>
+        </div>
+
+        <aside class="glass reveal">
+          <h2>O que o livro entrega</h2>
+          <ul>
+            <li>resumo executivo de dez minutos e rotas por função;</li>
+            <li>quatro gates entre hipótese e caixa;</li>
+            <li>BOM parametrizado, critérios de parada e decisão ternária;</li>
+            <li>ferramentas para uma primeira fase com possibilidade de resultado nulo.</li>
+          </ul>
+          <p class="note" style="margin-top:18px">Material educativo. Não substitui avaliação médica individual e não promete produtividade, economia, causalidade ou retorno.</p>
+        </aside>
       </div>
-      <p class="status"><strong>Disponibilidade em preparação.</strong> Canais planejados e preços sugeridos estão em validação; os links de compra ainda não estão ativos. Nenhuma venda ou pré-venda ocorre nesta página.</p>
-    </div>
-    <aside class="card">
-      <h2>O que o livro entrega</h2>
-      <ul><li>resumo executivo de dez minutos e rotas por função;</li><li>quatro gates entre hipótese e caixa;</li><li>BOM parametrizado, critérios de parada e decisão ternária;</li><li>ferramentas para uma primeira fase com possibilidade de resultado nulo.</li></ul>
-      <p class="note">Material educativo. Não substitui avaliação médica individual e não promete produtividade, economia, causalidade ou retorno.</p>
-    </aside>
-  </section>
 
-  <section class="section" id="comprar">
-    <h2>Formatos, canais e preços de referência</h2>
-    <p>Preços sugeridos para o lançamento no Brasil, sujeitos à validação do custo de impressão e à aprovação final em cada plataforma.</p>
-    <div class="grid">
-      <article class="card"><h3>E-book · R$ 39,90</h3><p>Amazon Kindle, Apple Books e Google Play Livros.</p><p class="note">Um único preço-base digital reduz confusão entre lojas.</p></article>
-      <article class="card"><h3>Impresso P&amp;B · R$ 89,90</h3><p>Amazon KDP e Clube de Autores.</p><p class="note">Preço condicionado ao custo unitário e à margem efetiva exibida pelas plataformas.</p></article>
-      <article class="card"><h3>Impresso colorido · R$ 129,90</h3><p>Amazon KDP e Clube de Autores, caso a prova física confirme valor visual e viabilidade.</p></article>
-    </div>
-    <p class="status"><strong>Links em breve.</strong> A landing própria será o diretório dos canais oficiais, sem processar pagamento enquanto o checkout não estiver validado.</p>
-  </section>
+      <div class="scroll-cue" aria-hidden="true"><span>role para investigar</span><span class="line"></span></div>
+    </section>
 
-  <section class="section">
-    <h2>Quem conduz cada decisão</h2>
-    <div class="grid">
-      <article class="card role"><h3>Campeão interno</h3><p>Saúde ocupacional, SESMT, ergonomia ou People/RH organiza a pergunta, os papéis e a via de cuidado.</p></article>
-      <article class="card role"><h3>Aprovador econômico</h3><p>CFO ou controladoria exige custo cotado, horizonte, critérios de parada e benefício observado antes de avaliar ROI.</p></article>
-      <article class="card role"><h3>Gates de governança</h3><p>Jurídico/DPO, saúde ocupacional e revisão metodológica validam dados, licenças, desenho e limites.</p></article>
-    </div>
-  </section>
+    <!-- ===================================================== O CUSTO (scrollytelling) -->
+    <section class="section" id="custo">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Por que "invisível"</span>
+          <h2>O filme lacrimal se rompe antes do próximo piscar — e o custo mora nesse intervalo.</h2>
+          <p>O olho seco raramente aparece como uma linha no orçamento. Ele se dilui em microinterrupções, correções e desconforto que ninguém contabiliza. Role e observe o filme se desestabilizar.</p>
+        </div>
 
-  <section class="section">
-    <h2>Três caminhos, sem mistura de papéis</h2>
-    <div class="grid">
-      <article class="card"><h3>Quero ler</h3><p>Conheça tese, método, limites e ferramentas antes de decidir pela compra.</p><a href="assets/amostra-v2.9.27.pdf" data-event="sample_download">Abrir amostra</a></article>
-      <article class="card"><h3>Quero levar à diretoria</h3><p>Use o kit para formular a pergunta sem prometer resposta.</p><a href="kit/" data-event="kit_access">Acessar materiais</a></article>
-      <article class="card"><h3>Quero avaliar prontidão</h3><p>Revise governança, dados, licença, capacidade e critérios de parada sem coletar dados de saúde.</p><a href="prontidao/" data-event="readiness_start">Iniciar avaliação</a></article>
-    </div>
-  </section>
+        <div class="stage">
+          <div class="sticky reveal">
+            <canvas id="breakup" aria-label="Visualização da ruptura do filme lacrimal conforme a rolagem"></canvas>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <span class="big">1</span>
+              <h3>Um sintoma sem fatura</h3>
+              <p>Ardência, embaçamento intermitente, pausas para "descansar a vista". Nenhum desses eventos chega ao controle de custos, mas todos consomem atenção durante o trabalho de tela.</p>
+            </article>
+            <article class="step">
+              <span class="big">2</span>
+              <h3>Capacidade, não economia</h3>
+              <p>O que se pode estimar com honestidade é <em>capacidade equivalente</em> — não um ROI. Quanto de esforço qualificado atravessa a instabilidade sem que ninguém a nomeie.</p>
+            </article>
+            <article class="step">
+              <span class="big">3</span>
+              <h3>Quatro gates até o caixa</h3>
+              <p>Entre a hipótese e qualquer decisão financeira existem gates: governança, dados, desenho e critérios de parada. Pular um deles fabrica causalidade — exatamente o que o método recusa.</p>
+            </article>
+            <article class="step">
+              <span class="big">0</span>
+              <h3>O resultado pode ser nulo</h3>
+              <p>A primeira fase é desenhada para admitir "não valeu a pena". Um método que não pode falhar não está medindo nada.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <section class="section" id="empresa">
-    <h2>Calculadora de capacidade e limiar</h2>
-    <p>Esta simulação não calcula economia, ROI ou payback. Ela mostra capacidade equivalente sob premissas e, quando há custo cotado, a fração que precisaria aparecer como benefício financeiro incremental e atribuível para cobrir esse custo.</p>
-    <div class="card">
-      <label for="n">Pessoas no escopo</label><input id="n" type="number" min="0" value="100">
-      <label for="c">Custo direto anual do trabalho por pessoa (R$)</label><input id="c" type="number" min="0" value="0">
-      <label for="p">Fração sintomática assumida (%)</label><input id="p" type="number" min="0" max="100" value="0">
-      <label for="l">Limitação percebida assumida (%)</label><input id="l" type="number" min="0" max="100" value="0">
-      <label for="k">Custo cotado no mesmo horizonte (R$)</label><input id="k" type="number" min="0" value="0">
-      <button class="btn primary" id="calc" type="button">Calcular cenário</button>
-      <div class="result" id="result" aria-live="polite">Preencha premissas documentadas. Zero significa indisponível, não ausência de custo ou efeito.</div>
-    </div>
-    <p class="note">Capacidade equivalente = N × custo direto × fração sintomática × limitação percebida. Limiar = custo cotado ÷ capacidade equivalente. Nenhuma dessas fórmulas prova benefício ou atribuição.</p>
-  </section>
+    <!-- ===================================================== FORMATOS -->
+    <section class="section" id="comprar">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Formatos, canais e preços de referência</span>
+          <h2>Preços sugeridos para o lançamento no Brasil</h2>
+          <p>Sujeitos à validação do custo de impressão e à aprovação final em cada plataforma.</p>
+        </div>
+        <div class="cards">
+          <article class="card reveal"><span class="price">R$ 39,90</span><h3>E-book</h3><p>Amazon Kindle, Apple Books e Google Play Livros.</p><p class="note">Um único preço-base digital reduz confusão entre lojas.</p></article>
+          <article class="card reveal"><span class="price">R$ 89,90</span><h3>Impresso P&amp;B</h3><p>Amazon KDP e Clube de Autores.</p><p class="note">Preço condicionado ao custo unitário e à margem efetiva exibida pelas plataformas.</p></article>
+          <article class="card reveal"><span class="price">R$ 129,90</span><h3>Impresso colorido</h3><p>Amazon KDP e Clube de Autores, caso a prova física confirme valor visual e viabilidade.</p></article>
+        </div>
+        <div class="status" role="note" style="margin-top:24px">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8v5m0 3h.01M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span><strong>Links em breve.</strong> A landing própria será o diretório dos canais oficiais, sem processar pagamento enquanto o checkout não estiver validado.</span>
+        </div>
+      </div>
+    </section>
 
-  <section class="section">
-    <div class="card">
-      <div class="eyebrow">Escuta editorial</div>
-      <h2>O que você espera antes — e o que permanece depois?</h2>
-      <p>Responda às entrevistas pré-leitura e pós-leitura com o mesmo código. São oito perguntas em cada etapa, com alternativas orientadoras e espaço para escrever com suas próprias palavras.</p>
-      <a class="btn primary" href="entrevistas/" data-event="interviews_view">Abrir entrevistas</a>
-    </div>
-  </section>
+    <!-- ===================================================== PAPÉIS -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Quem conduz cada decisão</span>
+          <h2>Três papéis, sem mistura de responsabilidades</h2>
+        </div>
+        <div class="cards">
+          <article class="card role reveal"><h3>Campeão interno</h3><p>Saúde ocupacional, SESMT, ergonomia ou People/RH organiza a pergunta, os papéis e a via de cuidado.</p></article>
+          <article class="card role reveal"><h3>Aprovador econômico</h3><p>CFO ou controladoria exige custo cotado, horizonte, critérios de parada e benefício observado antes de avaliar ROI.</p></article>
+          <article class="card role reveal"><h3>Gates de governança</h3><p>Jurídico/DPO, saúde ocupacional e revisão metodológica validam dados, licenças, desenho e limites.</p></article>
+        </div>
+      </div>
+    </section>
 
-  <section class="section">
-    <div class="card">
-      <h2>Precisa de apoio para organizar a decisão?</h2>
-      <p>O livro e o kit podem ser usados sem contratar o autor. Se a avaliação indicar lacunas de governança, dados ou critérios de parada, existe uma rota opcional de apoio organizacional — separada do atendimento clínico e sem promessa de piloto, produtividade ou ROI.</p>
-      <a class="btn secondary" href="servicos/" data-event="services_view">Conhecer limites e critérios de adequação</a>
+    <!-- ===================================================== TRÊS CAMINHOS -->
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Três caminhos, sem mistura de papéis</span>
+          <h2>Escolha por onde começar</h2>
+        </div>
+        <div class="cards">
+          <article class="card reveal"><span class="rank">01</span><h3>Quero ler</h3><p>Conheça tese, método, limites e ferramentas antes de decidir pela compra.</p><a class="inline" href="assets/amostra-v2.9.27.pdf" data-event="sample_download">Abrir amostra</a></article>
+          <article class="card reveal"><span class="rank">02</span><h3>Quero levar à diretoria</h3><p>Use o kit para formular a pergunta sem prometer resposta.</p><a class="inline" href="kit/" data-event="kit_access">Acessar materiais</a></article>
+          <article class="card reveal"><span class="rank">03</span><h3>Quero avaliar prontidão</h3><p>Revise governança, dados, licença, capacidade e critérios de parada sem coletar dados de saúde.</p><a class="inline" href="prontidao/" data-event="readiness_start">Iniciar avaliação</a></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== CALCULADORA -->
+    <section class="section" id="empresa">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Calculadora de capacidade e limiar</span>
+          <h2>Capacidade equivalente — não economia, ROI ou payback</h2>
+          <p>Esta simulação mostra a capacidade equivalente sob premissas e, quando há custo cotado, a fração que precisaria aparecer como benefício financeiro incremental e atribuível para cobrir esse custo.</p>
+        </div>
+
+        <div class="glass reveal">
+          <div class="calc">
+            <div class="fields">
+              <div class="field"><label for="n">Pessoas no escopo</label><input id="n" type="number" min="0" value="100" inputmode="numeric"></div>
+              <div class="field"><label for="c">Custo direto anual do trabalho por pessoa (R$)</label><input id="c" type="number" min="0" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="p">Fração sintomática assumida (%)</label><input id="p" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="l">Limitação percebida assumida (%)</label><input id="l" type="number" min="0" max="100" value="0" inputmode="numeric"></div>
+              <div class="field"><label for="k">Custo cotado no mesmo horizonte (R$)</label><input id="k" type="number" min="0" value="0" inputmode="numeric"></div>
+              <button class="btn primary" id="calc" type="button">Calcular cenário</button>
+            </div>
+
+            <div class="readout" aria-live="polite">
+              <div class="metric"><span class="k">Capacidade equivalente simulada</span><span class="v" id="out-capacity">indisponível</span></div>
+              <hr>
+              <div class="metric"><span class="k">Limiar de cobertura</span><span class="v" id="out-threshold">indisponível</span></div>
+              <hr>
+              <div class="metric"><span class="k">ROI</span><span class="v small" id="out-roi">Preencha premissas documentadas. Zero significa indisponível, não ausência de custo ou efeito.</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="note" style="margin-top:16px">Capacidade equivalente = N × custo direto × fração sintomática × limitação percebida. Limiar = custo cotado ÷ capacidade equivalente. Nenhuma dessas fórmulas prova benefício ou atribuição.</p>
+      </div>
+    </section>
+
+    <!-- ===================================================== ESCUTA EDITORIAL -->
+    <section class="section">
+      <div class="wrap">
+        <div class="band reveal">
+          <span class="eyebrow">Escuta editorial</span>
+          <h2>O que você espera antes — e o que permanece depois?</h2>
+          <p>Responda às entrevistas pré-leitura e pós-leitura com o mesmo código. São oito perguntas em cada etapa, com alternativas orientadoras e espaço para escrever com suas próprias palavras.</p>
+          <div class="actions">
+            <a class="btn primary" href="entrevistas/" data-event="interviews_view">Abrir entrevistas</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== SERVIÇOS -->
+    <section class="section">
+      <div class="wrap">
+        <div class="glass reveal">
+          <h2 style="font-size:clamp(1.6rem,3vw,2.4rem)">Precisa de apoio para organizar a decisão?</h2>
+          <p style="color:var(--muted);margin-top:12px;max-width:60ch">O livro e o kit podem ser usados sem contratar o autor. Se a avaliação indicar lacunas de governança, dados ou critérios de parada, existe uma rota opcional de apoio organizacional — separada do atendimento clínico e sem promessa de piloto, produtividade ou ROI.</p>
+          <div class="actions" style="margin-top:22px">
+            <a class="btn" href="servicos/" data-event="services_view">Conhecer limites e critérios de adequação</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span>© 2026 Dr. Philipe Saraiva Cruz · Material educativo</span>
+      <span>Página v2.9.27 · pré-lançamento sem venda ativa</span>
     </div>
-  </section>
-</main>
-<footer><p>© 2026 Dr. Philipe Saraiva Cruz. Material educativo. Página v2.9.27 · pré-lançamento sem venda ativa.</p></footer>
-<script src="assets/events.js"></script>
-<script>
-  window.bookTrack('landing_view');
-  document.getElementById('calc').addEventListener('click',()=>{
-    const v=id=>Number(document.getElementById(id).value||0),ce=v('n')*v('c')*(v('p')/100)*(v('l')/100),k=v('k');
-    const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}),limiar=ce>0&&k>0?k/ce:null;
-    document.getElementById('result').innerHTML=`<strong>Capacidade equivalente simulada:</strong> ${ce>0?money.format(ce):'indisponível'}<br><strong>Limiar de cobertura:</strong> ${limiar!==null?(limiar*100).toFixed(1).replace('.',',')+'%':'indisponível'}<br><strong>ROI:</strong> indisponível antes de benefício incremental, atribuível e auditável.`;
-    window.bookTrack('capacity_calculation',{inputs_complete:ce>0&&k>0});
-  });
-</script>
-</body></html>
+  </footer>
+
+  <script src="assets/events.js"></script>
+  <script>window.bookTrack("landing_view");</script>
+  <script src="assets/tearfilm.js" defer></script>
+  <script src="assets/experience.js" defer></script>
+</body>
+</html>
