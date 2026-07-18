@@ -13,7 +13,16 @@ def fail(message: str) -> None:
     raise SystemExit(f"REPROVA: {message}")
 
 release = json.loads((ROOT / "release.json").read_text())
-if release["book_version"] != "2.9.28": fail("versão pública divergente")
+version = release["book_version"]
+if not re.fullmatch(r"\d+\.\d+\.\d+", version): fail("versão pública inválida")
+if not re.fullmatch(r"[0-9a-f]{40}", release["source_commit"]): fail("commit-fonte inválido")
+if release["sale_state"] != "not_available": fail("venda ativada sem gate externo")
+if release["public_promotion"] is not False: fail("promoção pública ativada sem gate externo")
+if release["formats"] != []: fail("formatos comerciais declarados sem listing")
+for key in ("price", "channel", "checkout_url"):
+    if release[key] is not None: fail(f"{key} declarado sem checkout verificável")
+if release["kit"]["content_version"] != version or release["kit"]["compatible_with"] != version:
+    fail("compatibilidade do kit divergente")
 for key in ("sample", "kit"):
     item = release[key]
     path = ROOT / item["path"]
@@ -29,6 +38,23 @@ for path in html_files:
     if "_site" in path.parts: continue
     text = path.read_text()
     if 'content="noindex,nofollow"' not in text: fail(f"noindex ausente: {path.relative_to(ROOT)}")
+
+active_version_files = (
+    "index.html",
+    "kit/index.html",
+    "kit/COMPATIBILITY.md",
+    "prontidao/index.html",
+    "servicos/index.html",
+    "assets/events.js",
+)
+for relative in active_version_files:
+    text = (ROOT / relative).read_text()
+    found = {match.removeprefix("v") for match in re.findall(r"v?2\.9\.\d+", text)}
+    if found != {version}: fail(f"versão ativa divergente em {relative}: {sorted(found)}")
+
+home = (ROOT / "index.html").read_text().lower()
+for audience in ("saúde ocupacional", "rh", "ergonomia", "sesmt"):
+    if audience not in home: fail(f"público primário ausente do hero: {audience}")
 
 data = (ROOT / "entrevistas/data.js").read_text()
 match = re.fullmatch(r"\s*window\.INTERVIEW_SETS\s*=\s*(\{.*\})\s*;\s*", data, re.S)
@@ -62,4 +88,4 @@ api = (ROOT / "api/responses.js").read_text()
 for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "alreadyExists", "2026-03-11"):
     if needle not in api: fail(f"API sem {needle}")
 
-print("APROVA: site v2.9.28, amostra 30 páginas, entrevistas 8+8 e API Notion sem segredo no cliente")
+print(f"APROVA: site v{version}, amostra 30 páginas, venda desativada, versões ativas conciliadas, entrevistas 8+8 e API Notion sem segredo no cliente")
