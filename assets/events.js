@@ -1,5 +1,5 @@
 (() => {
-  const version = "2.9.29";
+  const version = "2.9.31";
   window.bookTrack = (name, detail = {}) => {
     const event = { event: name, version, path: window.location.pathname, ...detail };
     window.dataLayer = window.dataLayer || [];

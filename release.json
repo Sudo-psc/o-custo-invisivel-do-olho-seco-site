@@ -1,19 +1,19 @@
 {
   "schema": "book-landing-release/v1",
-  "book_version": "2.9.29",
-  "source_commit": "8dcb06a1bbf42793a06be608f0a869d648eda4f5",
+  "book_version": "2.9.31",
+  "source_commit": "4bcb1e658cb8bb57bb94986b1753115d061c5973",
   "source_state": "committed_candidate",
-  "source_pdf_sha256": "a0dea23378bf58f48d0c2d8c2b7364ecf426d72bfa4964ee6d40833f1784d663",
+  "source_pdf_sha256": "5d567f9c4555907849ca5d7e457a6fe8b1becc14303074f31f26fabbb7cbaf73",
   "sample": {
-    "path": "assets/amostra-v2.9.29.pdf",
+    "path": "assets/amostra-v2.9.31.pdf",
     "pages": 30,
-    "sha256": "419d34f7b6ad774202ebf09ee682d3bf6ffd490c0b0fcf972abf07d93576050c"
+    "sha256": "98dfc0074431300cb45f54912d6dd7c296e7bbf3f1772ef28e1380c9e159d54d"
   },
   "kit": {
-    "path": "assets/kit-execucao-v2.9.29.zip",
-    "content_version": "2.9.29",
-    "compatible_with": "2.9.29",
-    "sha256": "aa8d3e2d241d5cafe79dafcfb9d0e8b9e9d2444a098f254901f593cb4dccd57a"
+    "path": "assets/kit-execucao-v2.9.31.zip",
+    "content_version": "2.9.31",
+    "compatible_with": "2.9.31",
+    "sha256": "b3f5aade51206d02624d4eefbe8e512d4d5ccf5524b7fb0e7cd4c733d298a66f"
   },
   "sale_state": "not_available",
   "public_promotion": false,
@@ -40,5 +40,5 @@
     "notion_database_url": "https://app.notion.com/p/6221fadd68684819bd7271ea4349fa78",
     "data_collection": "editorial_responses_only"
   },
-  "updated_at": "2026-07-18"
+  "updated_at": "2026-07-19"
 }
