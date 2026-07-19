@@ -1,19 +1,19 @@
 {
   "schema": "book-landing-release/v1",
   "book_version": "2.9.31",
-  "source_commit": "4bcb1e658cb8bb57bb94986b1753115d061c5973",
+  "source_commit": "60a8770a5fa71b34fdbbb6f3f304960cf49cd92a",
   "source_state": "committed_candidate",
-  "source_pdf_sha256": "5d567f9c4555907849ca5d7e457a6fe8b1becc14303074f31f26fabbb7cbaf73",
+  "source_pdf_sha256": "24f7a0c646a4cb8442650b6c9a90e650ffef9d0988162103d1bc26545298f769",
   "sample": {
     "path": "assets/amostra-v2.9.31.pdf",
     "pages": 30,
-    "sha256": "98dfc0074431300cb45f54912d6dd7c296e7bbf3f1772ef28e1380c9e159d54d"
+    "sha256": "ab26d8e4371e6e27deb6e46555244541cebd4a058706a4b2b3f9d8982d68dcec"
   },
   "kit": {
     "path": "assets/kit-execucao-v2.9.31.zip",
     "content_version": "2.9.31",
     "compatible_with": "2.9.31",
-    "sha256": "b3f5aade51206d02624d4eefbe8e512d4d5ccf5524b7fb0e7cd4c733d298a66f"
+    "sha256": "021f5ed978b7ad14a089cf0f425ffb15d1e17f6a1e537a7262fd7f5d8f555e01"
   },
   "sale_state": "not_available",
   "public_promotion": false,
