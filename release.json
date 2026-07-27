@@ -1,19 +1,19 @@
 {
   "schema": "book-landing-release/v1",
-  "book_version": "2.9.31",
-  "source_commit": "60a8770a5fa71b34fdbbb6f3f304960cf49cd92a",
-  "source_state": "committed_candidate",
-  "source_pdf_sha256": "24f7a0c646a4cb8442650b6c9a90e650ffef9d0988162103d1bc26545298f769",
+  "book_version": "2.9.44",
+  "source_commit": "c4a9bdbfabd620f0aab5bdcc552f19287ded4718",
+  "source_state": "committed_release",
+  "source_pdf_sha256": "e7786fba72d7928dc53c8ffa1a552e6b7e74db566210db7e31fe9583734f6c7f",
   "sample": {
-    "path": "assets/amostra-v2.9.31.pdf",
+    "path": "assets/amostra-v2.9.44.pdf",
     "pages": 30,
-    "sha256": "ab26d8e4371e6e27deb6e46555244541cebd4a058706a4b2b3f9d8982d68dcec"
+    "sha256": "436bd72e90a9eb7ce7598c0c81e4f61e6036d09dec6d31e3b519c869848c4ce6"
   },
   "kit": {
-    "path": "assets/kit-execucao-v2.9.31.zip",
-    "content_version": "2.9.31",
-    "compatible_with": "2.9.31",
-    "sha256": "021f5ed978b7ad14a089cf0f425ffb15d1e17f6a1e537a7262fd7f5d8f555e01"
+    "path": "assets/kit-execucao-v2.9.44.zip",
+    "content_version": "2.9.44",
+    "compatible_with": "2.9.44",
+    "sha256": "ec3962d3e06016d87d8fb5813172c42170a718286d46071848afb5f6fb92dd06"
   },
   "sale_state": "not_available",
   "public_promotion": false,
@@ -40,5 +40,5 @@
     "notion_database_url": "https://app.notion.com/p/6221fadd68684819bd7271ea4349fa78",
     "data_collection": "editorial_responses_only"
   },
-  "updated_at": "2026-07-19"
+  "updated_at": "2026-07-27"
 }

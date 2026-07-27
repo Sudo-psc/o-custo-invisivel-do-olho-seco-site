@@ -1,12 +1,12 @@
-# Compatibilidade — livro v2.9.31
+# Compatibilidade — livro v2.9.44
 
-- Livro-fonte: commit `60a8770a5fa71b34fdbbb6f3f304960cf49cd92a`, candidato comprometido na branch `codex/fix-v2930-pendencias`.
-- PDF digital (174 páginas): SHA-256 `24f7a0c646a4cb8442650b6c9a90e650ffef9d0988162103d1bc26545298f769`.
-- Amostra de 30 páginas: SHA-256 `ab26d8e4371e6e27deb6e46555244541cebd4a058706a4b2b3f9d8982d68dcec`.
-- Kit editável: conteúdo v2.9.31, SHA-256 `021f5ed978b7ad14a089cf0f425ffb15d1e17f6a1e537a7262fd7f5d8f555e01`.
+- Livro-fonte: commit `c4a9bdbfabd620f0aab5bdcc552f19287ded4718`, integrado ao `master`.
+- PDF digital (182 páginas): SHA-256 `e7786fba72d7928dc53c8ffa1a552e6b7e74db566210db7e31fe9583734f6c7f`.
+- Amostra de 30 páginas: SHA-256 `436bd72e90a9eb7ce7598c0c81e4f61e6036d09dec6d31e3b519c869848c4ce6`.
+- Kit editável: conteúdo v2.9.44, SHA-256 `ec3962d3e06016d87d8fb5813172c42170a718286d46071848afb5f6fb92dd06`.
 
-A v2.9.31 preserva as ressalvas metodológicas da versão anterior, elimina duas páginas
-residuais, mantém a credencial do autor verificável por RQE/CRM e fecha o pacote
-técnico das capas de impressão.
+A v2.9.44 fecha as correções conservadoras de paginação, aspas e boxes,
+preserva as ressalvas metodológicas e sincroniza o companion, a amostra e o
+kit editável com o PDF final validado.
 
 Capacidade equivalente não é caixa; ROI permanece retrospectivo e depende de benefício incremental, atribuível e auditável.

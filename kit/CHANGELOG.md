@@ -1,5 +1,11 @@
 # Changelog da biblioteca
 
+## 2.9.44 — 2026-07-27
+
+- correções conservadoras de paginação, aspas e boxes incorporadas;
+- companion, amostra, kit e hashes sincronizados com a release v2.9.44;
+- venda continua desativada até previewers, prova física, listing e checkout.
+
 ## 2.9.31 — 2026-07-19
 
 - páginas residuais dos capítulos 7 e 15 eliminadas na fonte e na recomposição;
