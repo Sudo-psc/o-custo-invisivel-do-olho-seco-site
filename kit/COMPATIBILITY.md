@@ -1,12 +1,13 @@
-# Compatibilidade — livro v2.9.44
+# Compatibilidade — livro v2.9.45
 
-- Livro-fonte: commit `c4a9bdbfabd620f0aab5bdcc552f19287ded4718`, integrado ao `master`.
-- PDF digital (182 páginas): SHA-256 `e7786fba72d7928dc53c8ffa1a552e6b7e74db566210db7e31fe9583734f6c7f`.
-- Amostra de 30 páginas: SHA-256 `436bd72e90a9eb7ce7598c0c81e4f61e6036d09dec6d31e3b519c869848c4ce6`.
-- Kit editável: conteúdo v2.9.44, SHA-256 `ec3962d3e06016d87d8fb5813172c42170a718286d46071848afb5f6fb92dd06`.
+- Livro-fonte: commit `76236a5d524981e0cd2ac8edd7f332184d8716ce`.
+- Amostra de 30 páginas: SHA-256
+  `0589b6f2fa38e017f26217f424943af8837ef0bc4f062d0aafbd2e5be1f20cb2`.
+- Kit editável: conteúdo v2.9.45, SHA-256
+  `e6cb8c87cad1224b01dafa47b5a173dba9e04bcaa5f07c7bf5e267991da0011d`.
 
-A v2.9.44 fecha as correções conservadoras de paginação, aspas e boxes,
-preserva as ressalvas metodológicas e sincroniza o companion, a amostra e o
-kit editável com o PDF final validado.
+O kit acompanha a edição v2.9.45 e não deve ser apresentado como compatível
+com outra candidata sem nova reconciliação de conteúdo e hashes.
 
-Capacidade equivalente não é caixa; ROI permanece retrospectivo e depende de benefício incremental, atribuível e auditável.
+Capacidade equivalente não é caixa; ROI permanece retrospectivo e depende de
+benefício incremental, atribuível e auditável.

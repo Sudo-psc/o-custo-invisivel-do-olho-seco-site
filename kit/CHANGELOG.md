@@ -1,5 +1,11 @@
 # Changelog da biblioteca
 
+## 2.9.45 — 2026-07-29
+
+- landing própria, amostra, kit, referências e preços observados sincronizados;
+- capa e páginas internas corrigidas para renderização responsiva;
+- venda, pré-venda, checkout e promoção pública continuam desativados.
+
 ## 2.9.44 — 2026-07-27
 
 - correções conservadoras de paginação, aspas e boxes incorporadas;

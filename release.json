@@ -1,19 +1,17 @@
 {
   "schema": "book-landing-release/v1",
-  "book_version": "2.9.44",
-  "source_commit": "c4a9bdbfabd620f0aab5bdcc552f19287ded4718",
-  "source_state": "committed_release",
-  "source_pdf_sha256": "e7786fba72d7928dc53c8ffa1a552e6b7e74db566210db7e31fe9583734f6c7f",
+  "book_version": "2.9.45",
+  "source_commit": "76236a5d524981e0cd2ac8edd7f332184d8716ce",
   "sample": {
-    "path": "assets/amostra-v2.9.44.pdf",
+    "path": "assets/amostra-v2.9.45.pdf",
     "pages": 30,
-    "sha256": "436bd72e90a9eb7ce7598c0c81e4f61e6036d09dec6d31e3b519c869848c4ce6"
+    "sha256": "0589b6f2fa38e017f26217f424943af8837ef0bc4f062d0aafbd2e5be1f20cb2"
   },
   "kit": {
-    "path": "assets/kit-execucao-v2.9.44.zip",
-    "content_version": "2.9.44",
-    "compatible_with": "2.9.44",
-    "sha256": "ec3962d3e06016d87d8fb5813172c42170a718286d46071848afb5f6fb92dd06"
+    "path": "assets/kit-execucao-v2.9.45.zip",
+    "content_version": "2.9.45",
+    "compatible_with": "2.9.45",
+    "sha256": "e6cb8c87cad1224b01dafa47b5a173dba9e04bcaa5f07c7bf5e267991da0011d"
   },
   "sale_state": "not_available",
   "public_promotion": false,
@@ -28,17 +26,30 @@
     "landing própria",
     "Clube de Autores"
   ],
-  "pricing_recommendation_brl": {
-    "ebook": 39.90,
-    "paperback_bw": 89.90,
-    "paperback_color": 129.90,
-    "status": "recommended_pending_platform_cost_validation"
+  "observed_channel_prices_brl": {
+    "amazon_kdp_ebook": {
+      "price": 39.90,
+      "observed_at": "2026-07-19",
+      "status": "last_confirmed_in_kdp_dashboard",
+      "source": "artifacts/evidence/2026-07-19-kdp-ebook-publicacao-v2933/RELATORIO.md"
+    },
+    "clube_autores_a5_color": {
+      "price": 107.74,
+      "observed_at": "2026-07-27",
+      "status": "public_offer_observed",
+      "source": "https://clubedeautores.com.br/livro/o-custo-invisivel-do-olho-seco"
+    },
+    "clube_autores_a4_color": {
+      "price": 148.02,
+      "observed_at": "2026-07-27",
+      "status": "public_offer_observed",
+      "source": "https://clubedeautores.com.br/livro/o-custo-invisivel-do-olho-seco-2"
+    }
   },
   "analytics_provider": null,
   "interviews": {
     "questionnaire_version": "1.0.0",
-    "notion_database_url": "https://app.notion.com/p/6221fadd68684819bd7271ea4349fa78",
     "data_collection": "editorial_responses_only"
   },
-  "updated_at": "2026-07-27"
+  "updated_at": "2026-07-29"
 }

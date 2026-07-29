@@ -1,0 +1,42 @@
+{
+  "date": "2026-07-29",
+  "desktop": {
+    "viewport": [1440, 1000],
+    "document_scroll_width": 1440,
+    "page_images": [
+      {
+        "source": "assets/prints/livro-v2945-p77.png",
+        "rendered": [416, 624],
+        "natural": [900, 1350],
+        "aspect_ratio": "2 / 3"
+      },
+      {
+        "source": "assets/prints/livro-v2945-p93.png",
+        "rendered": [416, 624],
+        "natural": [900, 1350],
+        "aspect_ratio": "2 / 3"
+      },
+      {
+        "source": "assets/prints/livro-v2945-p117.png",
+        "rendered": [416, 624],
+        "natural": [900, 1350],
+        "aspect_ratio": "2 / 3"
+      }
+    ]
+  },
+  "mobile": {
+    "viewport": [390, 844],
+    "document_scroll_width": 390,
+    "horizontal_overflow": false,
+    "gate_overflow": {
+      "0": false,
+      "1": false,
+      "2": false,
+      "3": false
+    }
+  },
+  "fresh_navigation_console": {
+    "errors": 0,
+    "warnings": 0
+  }
+}
