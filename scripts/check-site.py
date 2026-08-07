@@ -119,6 +119,7 @@ active_version_files = (
     "index.html",
     "kit/index.html",
     "kit/COMPATIBILITY.md",
+    "livro/index.html",
     "prontidao/index.html",
     "referencias/index.html",
     "servicos/index.html",
@@ -148,6 +149,51 @@ for forbidden in (
 ):
     if forbidden in home:
         fail(f"texto comercial removido reapareceu: {forbidden}")
+
+flipbook = (ROOT / "livro/flipbook.js").read_text(encoding="utf-8")
+for needle in (
+    "buildLeafModel",
+    "mountTextLayer",
+    "toggleBookmark",
+    "addMark",
+    "audio.page",
+    "localStorage",
+    "prefers-reduced-motion",
+):
+    if needle not in flipbook:
+        fail(f"leitor sem {needle}")
+if "fetch(" not in flipbook or "livro.json" not in flipbook:
+    fail("leitor não consome o manifesto gerado")
+for forbidden in ("http://", "https://"):
+    if forbidden in flipbook:
+        fail(f"leitor com dependência externa: {forbidden}")
+
+reader = (ROOT / "livro/index.html").read_text(encoding="utf-8")
+for marker in (
+    'data-action="bookmark"',
+    'data-action="sound"',
+    "data-marker",
+    "data-search-input",
+    "data-thumbs",
+    "flipbook.js",
+):
+    if marker not in reader:
+        fail(f"controle do leitor ausente: {marker}")
+
+flipbook_css = (ROOT / "livro/flipbook.css").read_text(encoding="utf-8")
+if "@property --turn" not in flipbook_css or "backface-visibility" not in flipbook_css:
+    fail("efeito de virada de página não declarado no leitor")
+if "prefers-reduced-motion" not in flipbook_css:
+    fail("leitor sem respeito a movimento reduzido")
+
+generator = (ROOT / "scripts/build-flipbook.mjs").read_text(encoding="utf-8")
+for needle in ("release.sample.sha256", "pdftoppm", "pdftotext", "-bbox-layout"):
+    if needle not in generator:
+        fail(f"fluxo do flipbook sem {needle}")
+
+build_pages = (ROOT / "scripts/build-pages.mjs").read_text(encoding="utf-8")
+if "buildFlipbook" not in build_pages or '"livro"' not in build_pages:
+    fail("artefato Pages não inclui o flipbook")
 
 css = (ROOT / "assets/experience.css").read_text(encoding="utf-8")
 page_rule = re.search(r"\.page img\s*\{(?P<body>.*?)\}", css, re.S)
@@ -214,5 +260,6 @@ for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "al
 
 print(
     f"APROVA: site v{version}, capa e páginas responsivas, preços observados, "
-    "amostra 30 páginas, venda desativada, entrevistas 8+8 e API sem segredo no cliente"
+    "amostra 30 páginas, flipbook com marcador de texto e de página, "
+    "venda desativada, entrevistas 8+8 e API sem segredo no cliente"
 )

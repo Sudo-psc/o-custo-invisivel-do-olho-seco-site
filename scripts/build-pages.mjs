@@ -1,6 +1,7 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
+import { buildFlipbook } from "./build-flipbook.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const output = resolve(root, "_site");
@@ -15,9 +16,14 @@ if (parsed.protocol !== "https:" && !new Set(["127.0.0.1", "localhost"]).has(par
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 
-for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "assets", "entrevistas", "kit", "prontidao", "referencias", "servicos"]) {
+for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "assets", "entrevistas", "kit", "livro", "prontidao", "referencias", "servicos"]) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
+
+// as páginas do flipbook são derivadas do PDF verificado, não versionadas:
+// gerar direto no artefato mantém o repositório sem binários redundantes
+const flipbook = await buildFlipbook({ outDir: resolve(output, "livro"), quiet: true });
+console.log(`APROVA: flipbook com ${flipbook.page_count} páginas gerado a partir de ${flipbook.generated_from.path}`);
 
 const configPath = resolve(output, "entrevistas", "config.js");
 await readFile(configPath, "utf8");

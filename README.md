@@ -8,6 +8,7 @@ editoriais permanecem integradas a uma função serverless separada.
 
 - `/`: landing v2.9.45, sem venda, pré-venda ou checkout;
 - `/referencias/`: referências completas da edição;
+- `/livro/`: leitura interativa da amostra em flipbook HTML5;
 - `/kit/`: documentação do kit de execução;
 - `/prontidao/`: avaliação local de prontidão;
 - `/servicos/`: rota organizacional;
@@ -28,6 +29,33 @@ O valor do Amazon KDP está identificado como último valor confirmado no painel
 os valores do Clube dos Autores estão identificados como ofertas públicas
 observadas.
 
+## Flipbook
+
+`/livro/` é um leitor HTML5 da mesma amostra de 30 páginas: virada de página em
+3D com som sintetizado, marcador de texto sobre a camada de palavras do PDF,
+marcador de página, busca no texto, índice em miniaturas e retomada da leitura.
+Não depende de biblioteca externa nem de rede além do próprio site; marcações e
+posição ficam no `localStorage` do dispositivo e nada é transmitido.
+
+O fluxo de geração parte do contrato, não do repositório:
+
+```
+release.json  ->  verifica sha256 da amostra
+              ->  pdfinfo   páginas e geometria
+              ->  pdftoppm  paginas/p-NN.jpg (150 dpi) e m-NN.jpg (24 dpi)
+              ->  pdftotext -bbox-layout  camada de palavras
+              ->  livro.json (índice e busca) + palavras.json (seleção)
+```
+
+```bash
+npm run build:livro    # gera livro/paginas/, livro.json e palavras.json
+```
+
+O gerador falha se o sha256 ou a contagem de páginas divergirem de
+`release.json`, então o flipbook nunca mostra uma edição diferente da declarada.
+As imagens derivadas não são versionadas: `scripts/build-pages.mjs` roda o fluxo
+ao montar `_site/`. Requer `poppler-utils` (o workflow já instala).
+
 ## Build e deploy
 
 O push na branch `main` aciona `.github/workflows/deploy-pages.yml`.
@@ -41,7 +69,8 @@ INTERVIEW_API_URL=http://127.0.0.1:3000/api/responses npm run build:pages
 
 O gate valida versão, hashes, amostra de 30 páginas, imagem social 1200 × 630,
 proporção responsiva das páginas, preços observados, ausência dos disclaimers
-removidos, entrevistas 8+8 e ausência de segredo no cliente.
+removidos, entrevistas 8+8, controles e camada de texto do flipbook e ausência
+de segredo no cliente.
 
 ## Variáveis externas
 

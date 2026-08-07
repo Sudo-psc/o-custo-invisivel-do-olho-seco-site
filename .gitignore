@@ -5,3 +5,8 @@ _site/
 !.env.example
 node_modules/
 .DS_Store
+
+# artefatos derivados do PDF pelo fluxo do flipbook (npm run build:livro)
+livro/paginas/
+livro/livro.json
+livro/palavras.json

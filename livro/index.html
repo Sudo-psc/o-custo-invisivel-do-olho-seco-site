@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#06131f">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="book-version" content="2.9.45">
+  <title>Leitura interativa — O Custo Invisível do Olho Seco</title>
+  <meta name="description" content="Amostra de 30 páginas em flipbook HTML5, com marcador de texto, marcador de página e leitura interativa.">
+  <meta name="author" content="Dr. Philipe Saraiva Cruz">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="flipbook.css">
+</head>
+<body class="reader" data-panel="">
+  <a class="skip-link" href="#stage">Ir para a leitura</a>
+
+  <header class="reader-bar">
+    <a class="reader-bar__back" href="../" aria-label="Voltar para a página inicial">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M16 10H5M9 5l-5 5 5 5"/></svg>
+      <span>Início</span>
+    </a>
+
+    <div class="reader-bar__title">
+      <strong>O Custo Invisível do Olho Seco</strong>
+      <span>Amostra de 30 páginas · edição v2.9.45</span>
+    </div>
+
+    <div class="reader-bar__tools" role="group" aria-label="Ferramentas de leitura">
+      <button type="button" class="tool" data-action="bookmark" aria-pressed="false" title="Marcar esta página (B)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1Z"/></svg>
+        <span class="tool__label">Marcar página</span>
+      </button>
+      <button type="button" class="tool" data-action="spread" title="Alternar página única e página dupla (D)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5h8v14H3zM13 5h8v14h-8zM12 4v16"/></svg>
+        <span class="tool__label">Página dupla</span>
+      </button>
+      <button type="button" class="tool" data-action="sound" aria-pressed="true" title="Ligar ou desligar o som (M)">
+        <svg aria-hidden="true" viewBox="0 0 24 24" data-icon="on"><path d="M5 9v6h3l4 3.5v-13L8 9H5ZM16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+        <svg aria-hidden="true" viewBox="0 0 24 24" data-icon="off"><path d="M5 9v6h3l4 3.5v-13L8 9H5ZM16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>
+        <span class="tool__label">Som</span>
+      </button>
+      <button type="button" class="tool" data-action="fullscreen" aria-pressed="false" title="Tela cheia (F)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        <span class="tool__label">Tela cheia</span>
+      </button>
+      <span class="tool-divider" aria-hidden="true"></span>
+      <button type="button" class="tool" data-panel-toggle="indice" aria-expanded="false" aria-controls="painel" title="Índice de páginas (T)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h7v6H4zM13 5h7v6h-7zM4 13h7v6H4zM13 13h7v6h-7z"/></svg>
+        <span class="tool__label">Índice</span>
+      </button>
+      <button type="button" class="tool" data-panel-toggle="marcacoes" aria-expanded="false" aria-controls="painel" title="Marcações e páginas marcadas (N)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.5h14M5 12h14M5 18.5h9"/><path d="M17.5 16.5l2.5 2.5 3.5-4"/></svg>
+        <span class="tool__label">Marcações</span>
+        <b class="tool__badge" data-count="marks" hidden>0</b>
+      </button>
+      <button type="button" class="tool" data-panel-toggle="busca" aria-expanded="false" aria-controls="painel" title="Buscar no texto (/)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 20 20"/></svg>
+        <span class="tool__label">Buscar</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="stage" class="stage" tabindex="-1">
+    <div class="stage__status" data-status="loading">
+      <p class="stage__spinner" aria-hidden="true"></p>
+      <p data-status-text>Preparando a leitura…</p>
+    </div>
+
+    <button type="button" class="turner turner--prev" data-action="prev" aria-label="Página anterior" hidden>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+
+    <div class="book-frame" data-frame hidden>
+      <div class="book" data-book data-mode="double" aria-live="polite">
+        <div class="book__shadow" aria-hidden="true"></div>
+        <div class="book__leaves" data-leaves></div>
+        <div class="book__gutter" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <button type="button" class="turner turner--next" data-action="next" aria-label="Próxima página" hidden>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+
+    <p class="sr-only" role="status" data-announce></p>
+  </main>
+
+  <footer class="reader-foot" hidden data-foot>
+    <div class="scrub">
+      <label class="sr-only" for="scrub-input">Ir para a página</label>
+      <input id="scrub-input" type="range" min="1" max="30" step="1" value="1" data-scrub>
+      <div class="scrub__ticks" data-ticks aria-hidden="true"></div>
+    </div>
+    <div class="scrub__meta">
+      <span data-page-indicator>Página 1 de 30</span>
+      <span class="scrub__label" data-page-label></span>
+      <span class="scrub__hint">Arraste a página, use as setas ou role para virar</span>
+    </div>
+  </footer>
+
+  <aside id="painel" class="panel" hidden aria-label="Painel de leitura">
+    <header class="panel__head">
+      <h2 data-panel-title>Índice</h2>
+      <button type="button" class="panel__close" data-action="close-panel" aria-label="Fechar painel">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <section class="panel__view" data-view="indice" hidden>
+      <div class="thumbs" data-thumbs></div>
+    </section>
+
+    <section class="panel__view" data-view="marcacoes" hidden>
+      <div class="panel__group">
+        <h3>Páginas marcadas</h3>
+        <div class="bookmark-list" data-bookmarks></div>
+      </div>
+      <div class="panel__group">
+        <h3>Trechos marcados</h3>
+        <div class="mark-list" data-marks></div>
+      </div>
+      <div class="panel__actions">
+        <button type="button" class="ghost" data-action="export-marks">Exportar marcações</button>
+        <button type="button" class="ghost ghost--danger" data-action="clear-marks">Limpar tudo</button>
+      </div>
+      <p class="panel__note">As marcações ficam apenas neste navegador, no armazenamento local do dispositivo. Nada é enviado.</p>
+    </section>
+
+    <section class="panel__view" data-view="busca" hidden>
+      <form class="search" data-search-form role="search">
+        <label class="sr-only" for="search-input">Buscar no texto da amostra</label>
+        <input id="search-input" type="search" placeholder="Buscar no texto…" autocomplete="off" data-search-input>
+        <button type="submit" aria-label="Buscar">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 20 20"/></svg>
+        </button>
+      </form>
+      <p class="search__summary" data-search-summary>Digite ao menos duas letras para buscar nas 30 páginas.</p>
+      <div class="search__results" data-search-results></div>
+    </section>
+  </aside>
+
+  <div class="marker-pop" data-marker hidden role="dialog" aria-label="Marcador de texto">
+    <div class="marker-pop__colors" role="group" aria-label="Cor do marcador">
+      <button type="button" data-mark-color="citrino" style="--swatch:#d8bc7a" aria-label="Marcar em âmbar"></button>
+      <button type="button" data-mark-color="ciano" style="--swatch:#72f1e9" aria-label="Marcar em ciano"></button>
+      <button type="button" data-mark-color="coral" style="--swatch:#ff8c71" aria-label="Marcar em coral"></button>
+    </div>
+    <span class="marker-pop__sep" aria-hidden="true"></span>
+    <button type="button" class="marker-pop__action" data-mark-action="copy">Copiar</button>
+    <button type="button" class="marker-pop__action" data-mark-action="remove" hidden>Remover</button>
+  </div>
+
+  <div class="toast" data-toast hidden role="status"></div>
+
+  <script src="flipbook.js" defer></script>
+</body>
+</html>
