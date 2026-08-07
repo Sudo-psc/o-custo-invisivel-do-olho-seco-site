@@ -200,32 +200,57 @@ if "buildFlipbook" not in build_pages or '"livro"' not in build_pages:
 # nenhum data-event do HTML pode ficar fora dele.
 contract = (ROOT / "ANALYTICS-CONTRACT.md").read_text(encoding="utf-8")
 table = re.search(
-    r"## Eventos permitidos\s*\n\n\|[^\n]*\n\|[-\s|]+\n(.*?)(?:\n\s*\n|\Z)", contract, re.S
+    r"## Eventos permitidos\b.*?\n\|\s*Evento\s*\|[^\n]*\n\|[-\s|]+\n(.*?)(?:\n\s*\n|\Z)",
+    contract,
+    re.S,
 )
 if not table:
     fail("tabela de eventos do contrato de analytics não encontrada")
-declared_events: set[str] = set()
+# Uma linha por evento: nome na primeira coluna, chaves exatas do payload na
+# terceira. As duas colunas são comparadas literalmente com o SCHEMA.
+declared: dict[str, set[str]] = {}
 for row in table.group(1).splitlines():
     cells = row.split("|")
-    if len(cells) < 2:
+    if len(cells) < 4:
         continue
-    declared_events |= set(re.findall(r"`([a-z_]+)`", cells[1]))
-if not declared_events:
+    names = re.findall(r"`([a-z_]+)`", cells[1])
+    if len(names) != 1:
+        fail(f"linha do contrato precisa declarar exatamente um evento: {cells[1].strip()}")
+    declared[names[0]] = set(re.findall(r"`([a-z_]+)`", cells[3]))
+if not declared:
     fail("contrato de analytics sem eventos declarados")
 
 events_js = (ROOT / "assets/events.js").read_text(encoding="utf-8")
-schema = re.search(r"const SCHEMA = \{\n(.*?)\n  \};", events_js, re.S)
-if not schema:
-    fail("camada de coleta sem SCHEMA")
-implemented_events = set(re.findall(r"^\s{4}([a-z_]+):", schema.group(1), re.M))
+# Tolerante a espaçamento e a quebras de linha dentro do bloco: se ainda assim
+# não casar, o gate reprova — errar para o lado do CI vermelho, nunca do verde.
+schema_block = re.search(r"const\s+SCHEMA\s*=\s*\{(.*?)\n\s*\};", events_js, re.S)
+if not schema_block:
+    fail("camada de coleta sem SCHEMA reconhecível")
+implemented = {
+    name: {field for field in re.findall(r"\"([a-z_]+)\"", fields)}
+    for name, fields in re.findall(
+        r"^\s*([a-z_]+)\s*:\s*\[([^\]]*)\]", schema_block.group(1), re.M
+    )
+}
+if not implemented:
+    fail("SCHEMA da camada de coleta sem eventos")
 
-if declared_events != implemented_events:
-    missing = sorted(declared_events - implemented_events)
-    extra = sorted(implemented_events - declared_events)
+if set(declared) != set(implemented):
+    missing = sorted(set(declared) - set(implemented))
+    extra = sorted(set(implemented) - set(declared))
     fail(
         "contrato e camada de analytics divergem: "
         f"sem implementação {missing}, fora do contrato {extra}"
     )
+for name, fields in sorted(declared.items()):
+    if fields != implemented[name]:
+        fail(
+            f"campos de {name} divergem: contrato {sorted(fields)}, "
+            f"camada {sorted(implemented[name])}"
+        )
+base_fields = set(re.findall(r"\"([a-z_]+)\"", re.search(r"BASE_FIELDS = \[([^\]]*)\]", events_js).group(1)))
+if base_fields != {"version", "route"}:
+    fail(f"campos base da camada divergem do contrato: {sorted(base_fields)}")
 
 used_events: set[str] = set()
 for path in html_files:
@@ -234,7 +259,7 @@ for relative in ("prontidao/index.html", "servicos/index.html", "livro/flipbook.
     used_events |= set(
         re.findall(r'(?:bookTrack|track)\(\s*"([a-z_]+)"', (ROOT / relative).read_text(encoding="utf-8"))
     )
-outside = sorted(used_events - declared_events)
+outside = sorted(used_events - set(declared))
 if outside:
     fail(f"evento disparado fora do contrato de analytics: {outside}")
 
@@ -324,6 +349,6 @@ for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "al
 print(
     f"APROVA: site v{version}, capa e páginas responsivas, preços observados, "
     "amostra 30 páginas, flipbook com marcador de texto e de página, "
-    f"analytics com {len(declared_events)} eventos conforme o contrato e sem transmissão, "
+    f"analytics com {len(declared)} eventos e campos conforme o contrato e sem transmissão, "
     "venda desativada, entrevistas 8+8 e API sem segredo no cliente"
 )

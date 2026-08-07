@@ -96,6 +96,49 @@ Camada exercitada no artefato `_site` com Chromium:
   virar sai de baixo da gaveta; a virada funciona com o painel aberto;
 - zero erro de console em todas as rotas.
 
+## Rodada de review (PR #4)
+
+Cinco apontamentos, todos procedentes. Os dois P1 foram levantados
+independentemente pelos dois revisores.
+
+- **Página dupla contava metade das páginas** (P1). `primaryPage()` devolve só
+  a página da direita, então `reading.seen`, `flipbook_page_view` e
+  `pages_seen` registravam 1, 3, 5, 7 e ignoravam toda página par — subcontagem
+  de metade na única métrica que o resumo existe para produzir. Agora o laço
+  percorre as duas páginas do spread. Verificado: sequência `[1,2,3,4,5,6,7]` e
+  `pages_seen: 7`, contra `[1,3,5,7]` e `pages_seen: 4` antes.
+- **Opt-out não valia com `localStorage` bloqueado** (P1). Se o armazenamento
+  lançasse, `setOptOut` não guardava nada e `storedOptOut()` seguia devolvendo
+  `false`: a página dizia que a medição estava ativa e continuava coletando
+  depois do clique em "Desativar medição" — falha de privacidade, não de
+  conveniência. Adicionado `sessionOptOut`, consultado antes do armazenamento,
+  de modo que a escolha vale imediatamente, persista ou não. Verificado com
+  `localStorage` lançando `SecurityError`: rótulo e botão corretos,
+  `isEnabled()` falso, zero eventos novos, buffer zerado e reativação na
+  sessão funcionando, sem erro de console.
+- **Busca abandonada virava evento** (P2). O timer de assentamento só era
+  cancelado depois do corte de dois caracteres; apagar o termo dentro da janela
+  de 900 ms deixava o evento anterior escapar. O cancelamento subiu para antes
+  do corte. Verificado: termo apagado não gera evento; termo mantido gera.
+- **Coluna de campos em linguagem natural** (Copilot). O documento se dizia
+  executável mas descrevia "destino" e "host do referrer" enquanto o `SCHEMA`
+  usa `href` e `referrer_host`. A tabela passou a listar as chaves exatas, uma
+  linha por evento, e o gate passou a comparar também os campos — não só os
+  nomes de evento — além dos campos base.
+- **Extração frágil do `SCHEMA`** (Copilot). O regex exigia indentação exata.
+  Ficou tolerante a espaçamento; e quando não casa, o gate reprova, então o
+  modo de falha é CI vermelho, nunca verde indevido. Verificado: com a
+  indentação alterada o gate continua aprovando.
+
+O gate reforçado foi exercitado contra desvio deliberado:
+
+| Desvio introduzido | Resultado |
+|---|---|
+| campo a mais no `SCHEMA` | REPROVA: campos de `flipbook_bookmark` divergem |
+| campo a mais na tabela | REPROVA: campos de `flipbook_mark` divergem |
+| `user_id` nos campos base | REPROVA: campos base divergem do contrato |
+| indentação diferente no `SCHEMA` | APROVA, como esperado |
+
 ## Ressalva registrada
 
 A landing mantém 14 px de overflow horizontal em 390 × 844, originados de

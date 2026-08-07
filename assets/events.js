@@ -62,7 +62,13 @@
     );
   }
 
+  // Escolha feita nesta sessão. Existe porque `localStorage` pode lançar
+  // (armazenamento bloqueado, modo privado): sem isto, desligar a medição não
+  // teria efeito algum e a página ainda diria que está ativa.
+  let sessionOptOut = null;
+
   function storedOptOut() {
+    if (sessionOptOut !== null) return sessionOptOut;
     try {
       return localStorage.getItem(OPT_OUT_KEY) === "1";
     } catch {
@@ -125,11 +131,13 @@
   }
 
   function setOptOut(value) {
+    // a escolha vale imediatamente, persista ou não
+    sessionOptOut = Boolean(value);
     try {
       if (value) localStorage.setItem(OPT_OUT_KEY, "1");
       else localStorage.removeItem(OPT_OUT_KEY);
     } catch {
-      /* modo privado: a escolha vale só para esta sessão */
+      /* armazenamento indisponível: a escolha vale só para esta sessão */
     }
     if (value) buffer.length = 0;
     window.dispatchEvent(new CustomEvent("book:analytics-consent", { detail: { enabled: isEnabled() } }));

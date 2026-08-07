@@ -520,13 +520,15 @@
     const marked = pages.some((page) => bookmarks.includes(page));
     $("[data-action='bookmark']").setAttribute("aria-pressed", String(marked));
 
-    const page = primaryPage();
-    if (!reading.seen.has(page)) {
-      reading.seen.add(page);
-      reading.deepest = Math.max(reading.deepest, ...pages);
+    // Em página dupla o spread mostra duas páginas: contar só a da direita
+    // subestimaria pela metade a profundidade de leitura que o resumo reporta.
+    for (const seen of pages) {
+      if (reading.seen.has(seen)) continue;
+      reading.seen.add(seen);
       reading.reported = false;
-      track("flipbook_page_view", { page, mode: state.mode });
+      track("flipbook_page_view", { page: seen, mode: state.mode });
     }
+    if (pages.length) reading.deepest = Math.max(reading.deepest, ...pages);
 
     if (announce) dom.announce.textContent = `${shown} de ${book.page_count}. ${label}`;
     $$(".thumb").forEach((thumb) => {
@@ -1003,6 +1005,9 @@
   function runSearch(query) {
     dom.searchResults.textContent = "";
     searchHits = [];
+    // cancela antes do corte de tamanho: apagar o termo dentro da janela de
+    // espera não pode deixar a busca anterior escapar como se tivesse assentado
+    window.clearTimeout(searchSettle);
     const needle = fold(query.trim());
     if (needle.length < 2) {
       dom.searchSummary.textContent = "Digite ao menos duas letras para buscar nas 30 páginas.";
@@ -1024,7 +1029,6 @@
 
     // a busca roda a cada tecla; a medição espera o termo assentar para não
     // registrar cada prefixo digitado como uma busca separada
-    window.clearTimeout(searchSettle);
     searchSettle = window.setTimeout(() => {
       track("flipbook_search", { hits: count, pages: reached, term_band: termBand(query) });
     }, 900);

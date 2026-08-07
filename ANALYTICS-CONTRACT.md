@@ -9,28 +9,35 @@ camada de coleta, e um campo fora da linha do evento é removido do payload.
 
 ## Eventos permitidos
 
-| Evento | Finalidade | Campos permitidos |
-|---|---|---|
-| `page_view` | visita à página | versão, rota, host do referrer |
-| `sample_download` | interesse editorial | versão, rota, destino |
-| `kit_access` / `kit_download` | ativação do recurso | versão, rota, destino |
-| `readiness_start` / `readiness_complete` | uso do scorecard | versão, rota e faixa agregada; nunca respostas individuais |
-| `services_view` / `services_after_readiness` | interesse organizacional | versão, rota e destino |
-| `interviews_view` | interesse nas entrevistas | versão, rota e destino |
-| `fit_conversation_email` | intenção de contato | apenas clique; conteúdo do e-mail não é analytics |
-| `purchase_click` | saída para canal | formato e canal, após definição humana |
-| `flipbook_open` | abertura do leitor | versão, rota e formato de página |
-| `flipbook_page_view` | profundidade de leitura | versão, rota, número da página e formato |
-| `flipbook_turn` | forma de navegar | versão, rota, direção e método |
-| `flipbook_bookmark` | uso do marcador de página | versão, rota, página e ação |
-| `flipbook_mark` | uso do marcador de texto | versão, rota, página, cor e ação; nunca o trecho marcado |
-| `flipbook_search` | busca no texto | versão, rota, ocorrências, páginas alcançadas e faixa de tamanho do termo; nunca o termo |
-| `flipbook_marks_export` | exportação das marcações | versão, rota e contagens |
-| `flipbook_setting` | preferência de leitura | versão, rota, ajuste e estado |
-| `flipbook_reading_summary` | alcance da leitura | versão, rota, páginas distintas, página mais profunda, faixa de duração e contagens |
+A coluna de campos lista as chaves exatas do payload, uma linha por evento, e é
+comparada literalmente com o `SCHEMA` da camada. `—` significa que o evento não
+carrega campo próprio.
 
-Todo evento carrega `version` e `route`. Nenhum outro campo é adicionado
-automaticamente.
+| Evento | Finalidade | Campos próprios |
+|---|---|---|
+| `page_view` | visita à página | `referrer_host` |
+| `sample_download` | interesse editorial | `href` |
+| `kit_access` | acesso ao recurso | `href` |
+| `kit_download` | download do recurso | `href` |
+| `readiness_start` | início do scorecard | — |
+| `readiness_complete` | conclusão do scorecard | `readiness_band`; nunca respostas individuais |
+| `services_view` | interesse organizacional | `href` |
+| `services_after_readiness` | interesse após o scorecard | `href` |
+| `interviews_view` | interesse nas entrevistas | `href` |
+| `fit_conversation_email` | intenção de contato | — ; conteúdo do e-mail não é analytics |
+| `purchase_click` | saída para canal | `format`, `channel`, após definição humana |
+| `flipbook_open` | abertura do leitor | `mode` |
+| `flipbook_page_view` | profundidade de leitura | `page`, `mode` |
+| `flipbook_turn` | forma de navegar | `direction`, `method` |
+| `flipbook_bookmark` | uso do marcador de página | `page`, `action` |
+| `flipbook_mark` | uso do marcador de texto | `page`, `color`, `action`; nunca o trecho marcado |
+| `flipbook_search` | busca no texto | `hits`, `pages`, `term_band`; nunca o termo |
+| `flipbook_marks_export` | exportação das marcações | `marks`, `bookmarks` |
+| `flipbook_setting` | preferência de leitura | `setting`, `state` |
+| `flipbook_reading_summary` | alcance da leitura | `pages_seen`, `deepest_page`, `duration_band`, `marks`, `bookmarks` |
+
+Todo evento carrega `version` e `route`, preenchidos pela camada. Nenhum outro
+campo é adicionado automaticamente.
 
 ## Dados proibidos
 
