@@ -34,8 +34,9 @@ observadas.
 `/livro/` é um leitor HTML5 da mesma amostra de 30 páginas: virada de página em
 3D com som sintetizado, marcador de texto sobre a camada de palavras do PDF,
 marcador de página, busca no texto, índice em miniaturas e retomada da leitura.
-Não depende de biblioteca externa nem de rede além do próprio site; marcações e
-posição ficam no `localStorage` do dispositivo e nada é transmitido.
+Não depende de biblioteca externa. As marcações e a posição de leitura ficam no
+`localStorage` do dispositivo e nunca são transmitidas — o que a medição
+registra é apenas *que* houve marcação, nunca o trecho. Veja Analytics abaixo.
 
 O fluxo de geração parte do contrato, não do repositório:
 
@@ -55,6 +56,59 @@ O gerador falha se o sha256 ou a contagem de páginas divergirem de
 `release.json`, então o flipbook nunca mostra uma edição diferente da declarada.
 As imagens derivadas não são versionadas: `scripts/build-pages.mjs` roda o fluxo
 ao montar `_site/`. Requer `poppler-utils` (o workflow já instala).
+
+## Analytics
+
+`ANALYTICS-CONTRACT.md` é executável: a tabela de eventos é a fonte da verdade
+e `assets/events.js` a implementa em `SCHEMA`. Evento fora da tabela é
+descartado, campo fora da linha do evento é removido, e valores só podem ser
+número, booleano ou texto de até 64 caracteres — por isso o termo de busca e o
+trecho marcado não atravessam a camada, entram como faixa e contagem.
+
+Os eventos vão para `dataLayer`, para um `CustomEvent` por nome e para um
+buffer de sessão em memória. Enquanto não houver instância configurada, é só
+isso: nada é transmitido. Com instância, os mesmos eventos — e apenas eles —
+seguem para ela. `Do Not Track` e `Global Privacy Control` desligam a coleta, e
+há opt-out em `/privacidade/` e no leitor, em Marcações › Medição de leitura.
+
+O gate reprova se a tabela e o `SCHEMA` divergirem, se algum `data-event` ou
+`track()` ficar fora do contrato, ou se aparecer `fetch`, `sendBeacon`,
+`XMLHttpRequest` ou URL na camada.
+
+### Instância própria de Umami
+
+O destino é uma instância própria, ligada por configuração — o endereço nunca
+está no código. Sem as duas variáveis o site não carrega script de medição nem
+faz requisição alguma.
+
+```bash
+UMAMI_URL=https://metricas.seu-dominio.com.br \
+UMAMI_WEBSITE_ID=<uuid do site no painel> \
+INTERVIEW_API_URL=<endpoint> npm run build:pages
+```
+
+No GitHub Actions, as mesmas duas como variáveis do repositório. O build
+recusa endereço sem HTTPS, identificador malformado ou uma das duas sozinha.
+
+Para subir a instância (Docker, com Postgres):
+
+```bash
+git clone https://github.com/umami-software/umami.git && cd umami
+# defina DATABASE_URL e APP_SECRET no .env
+docker compose up -d
+```
+
+Depois, no painel: crie o site, copie o *Website ID*, e ajuste a retenção para
+os 12 meses declarados em `ANALYTICS-CONTRACT.md` e em `/privacidade/`.
+
+O script sobe com `data-auto-track="false"`, então a instância recebe apenas os
+eventos do contrato — nenhuma visita, clique ou rolagem é capturada por conta
+própria. Com opt-out do leitor ou com `Do Not Track`/`Global Privacy Control`,
+o script sequer é solicitado.
+
+Declarar `analytics_provider` em `release.json` obriga, pelo gate, a publicar
+`/privacidade/`, declarar retenção, manter `auto_track` e `cookies` em `false`
+e nomear o provedor no contrato.
 
 ## Build e deploy
 

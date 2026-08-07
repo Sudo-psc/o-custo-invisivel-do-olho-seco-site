@@ -120,6 +120,7 @@ active_version_files = (
     "kit/index.html",
     "kit/COMPATIBILITY.md",
     "livro/index.html",
+    "privacidade/index.html",
     "prontidao/index.html",
     "referencias/index.html",
     "servicos/index.html",
@@ -195,6 +196,134 @@ build_pages = (ROOT / "scripts/build-pages.mjs").read_text(encoding="utf-8")
 if "buildFlipbook" not in build_pages or '"livro"' not in build_pages:
     fail("artefato Pages não inclui o flipbook")
 
+# O contrato de analytics é executável: a tabela do documento e o SCHEMA da
+# camada de coleta precisam declarar exatamente o mesmo conjunto de eventos, e
+# nenhum data-event do HTML pode ficar fora dele.
+contract = (ROOT / "ANALYTICS-CONTRACT.md").read_text(encoding="utf-8")
+table = re.search(
+    r"## Eventos permitidos\b.*?\n\|\s*Evento\s*\|[^\n]*\n\|[-\s|]+\n(.*?)(?:\n\s*\n|\Z)",
+    contract,
+    re.S,
+)
+if not table:
+    fail("tabela de eventos do contrato de analytics não encontrada")
+# Uma linha por evento: nome na primeira coluna, chaves exatas do payload na
+# terceira. As duas colunas são comparadas literalmente com o SCHEMA.
+declared: dict[str, set[str]] = {}
+for row in table.group(1).splitlines():
+    cells = row.split("|")
+    if len(cells) < 4:
+        continue
+    names = re.findall(r"`([a-z_]+)`", cells[1])
+    if len(names) != 1:
+        fail(f"linha do contrato precisa declarar exatamente um evento: {cells[1].strip()}")
+    declared[names[0]] = set(re.findall(r"`([a-z_]+)`", cells[3]))
+if not declared:
+    fail("contrato de analytics sem eventos declarados")
+
+events_js = (ROOT / "assets/events.js").read_text(encoding="utf-8")
+# Tolerante a espaçamento e a quebras de linha dentro do bloco: se ainda assim
+# não casar, o gate reprova — errar para o lado do CI vermelho, nunca do verde.
+schema_block = re.search(r"const\s+SCHEMA\s*=\s*\{(.*?)\n\s*\};", events_js, re.S)
+if not schema_block:
+    fail("camada de coleta sem SCHEMA reconhecível")
+implemented = {
+    name: {field for field in re.findall(r"\"([a-z_]+)\"", fields)}
+    for name, fields in re.findall(
+        r"^\s*([a-z_]+)\s*:\s*\[([^\]]*)\]", schema_block.group(1), re.M
+    )
+}
+if not implemented:
+    fail("SCHEMA da camada de coleta sem eventos")
+
+if set(declared) != set(implemented):
+    missing = sorted(set(declared) - set(implemented))
+    extra = sorted(set(implemented) - set(declared))
+    fail(
+        "contrato e camada de analytics divergem: "
+        f"sem implementação {missing}, fora do contrato {extra}"
+    )
+for name, fields in sorted(declared.items()):
+    if fields != implemented[name]:
+        fail(
+            f"campos de {name} divergem: contrato {sorted(fields)}, "
+            f"camada {sorted(implemented[name])}"
+        )
+base_fields = set(re.findall(r"\"([a-z_]+)\"", re.search(r"BASE_FIELDS = \[([^\]]*)\]", events_js).group(1)))
+if base_fields != {"version", "route"}:
+    fail(f"campos base da camada divergem do contrato: {sorted(base_fields)}")
+
+used_events: set[str] = set()
+for path in html_files:
+    used_events |= set(re.findall(r'data-event="([a-z_]+)"', path.read_text(encoding="utf-8")))
+for relative in ("prontidao/index.html", "servicos/index.html", "livro/flipbook.js"):
+    used_events |= set(
+        re.findall(r'(?:bookTrack|track)\(\s*"([a-z_]+)"', (ROOT / relative).read_text(encoding="utf-8"))
+    )
+outside = sorted(used_events - set(declared))
+if outside:
+    fail(f"evento disparado fora do contrato de analytics: {outside}")
+
+# Não prova ausência de tráfego — o envio real é o script do provedor. Prova
+# que não há endpoint fixo nem transporte improvisado fora da configuração.
+for forbidden in ("fetch(", "sendBeacon", "XMLHttpRequest", "http://", "https://"):
+    if forbidden in events_js:
+        fail(
+            f"camada de analytics com endpoint fixo ou transporte próprio ({forbidden}): "
+            "o destino tem de vir da configuração gerada no build"
+        )
+for needle in ("doNotTrack", "globalPrivacyControl", "analytics-optout", "MAX_STRING"):
+    if needle not in events_js:
+        fail(f"camada de analytics sem {needle}")
+
+# O destino vem da configuração gerada no build, nunca do código; e o script do
+# provedor só pode subir com auto-track desligado e com a medição ligada.
+config_js = (ROOT / "assets/analytics-config.js").read_text(encoding="utf-8")
+if not re.search(r"window\.ANALYTICS_SINK\s*=\s*null\s*;", config_js):
+    fail("configuração de analytics versionada deve ser nula; o destino vem do build")
+# opt-out fora do leitor: todas as rotas medem, e o aviso é o caminho de recusa
+notice_optout = (ROOT / "privacidade/index.html").read_text(encoding="utf-8")
+for needle in ("bookAnalytics", "optOut", "alternar-medicao"):
+    if needle not in notice_optout:
+        fail(f"aviso de privacidade sem controle de recusa: {needle}")
+
+for needle in ("autoTrack", "isEnabled()", "ANALYTICS_SINK"):
+    if needle not in events_js:
+        fail(f"conexão do provedor sem {needle}")
+if 'script.dataset.autoTrack = "false"' not in events_js:
+    fail("script do provedor sem auto-track desligado")
+if "UMAMI_URL" not in build_pages or "UMAMI_WEBSITE_ID" not in build_pages:
+    fail("build não injeta o destino da coleta")
+
+# Declarar provedor obriga a publicar o aviso e a fechar os itens do gate.
+provider = release["analytics_provider"]
+if provider is not None:
+    analytics = release.get("analytics", {})
+    notice = ROOT / str(analytics.get("privacy_notice", ""))
+    if not notice.is_file():
+        fail("provedor declarado sem página de privacidade publicada")
+    if analytics.get("auto_track") is not False or analytics.get("cookies") is not False:
+        fail("provedor declarado com auto-track ou cookie")
+    if not isinstance(analytics.get("retention_months"), int):
+        fail("provedor declarado sem retenção definida")
+    for needle in ("umami", "Retenção", "Base legal", "/privacidade/"):
+        if needle.lower() not in contract.lower():
+            fail(f"contrato não documenta o provedor: {needle}")
+    notice_text = notice.read_text(encoding="utf-8")
+    for needle in ("Base legal", "Como recusar", "Seus direitos", "mailto:", "12 meses"):
+        if needle not in notice_text:
+            fail(f"aviso de privacidade sem {needle}")
+    if 'href="privacidade/"' not in home:
+        fail("aviso de privacidade não está linkado na página inicial")
+
+reader_privacy = (ROOT / "livro/flipbook.js").read_text(encoding="utf-8")
+for forbidden in ("term:", "query:", "text: term", "mark.text,"):
+    if forbidden in reader_privacy:
+        fail(f"leitor enviando conteúdo de leitura para analytics: {forbidden}")
+for needle in ("term_band: termBand(", "duration_band: durationBand("):
+    if needle not in reader_privacy:
+        fail(f"leitor sem agregação em faixas: {needle}")
+
 css = (ROOT / "assets/experience.css").read_text(encoding="utf-8")
 page_rule = re.search(r"\.page img\s*\{(?P<body>.*?)\}", css, re.S)
 if not page_rule or "height: auto;" not in page_rule.group("body"):
@@ -261,5 +390,7 @@ for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "al
 print(
     f"APROVA: site v{version}, capa e páginas responsivas, preços observados, "
     "amostra 30 páginas, flipbook com marcador de texto e de página, "
+    f"analytics com {len(declared)} eventos e campos conforme o contrato, "
+    f"destino {provider or 'nenhum'} sem auto-track e com aviso publicado, "
     "venda desativada, entrevistas 8+8 e API sem segredo no cliente"
 )

@@ -32,6 +32,9 @@ jobs:
       - name: Build Pages artifact
         env:
           INTERVIEW_API_URL: ${{ vars.INTERVIEW_API_URL }}
+          # sem as duas, o site sai sem medição e sem requisição a provedor
+          UMAMI_URL: ${{ vars.UMAMI_URL }}
+          UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
         run: npm run build:pages
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

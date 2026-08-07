@@ -69,6 +69,42 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const coarse = window.matchMedia("(pointer: coarse)");
 
+  /* -------------------------------------------------------------- medição */
+
+  // A camada de coleta (assets/events.js) filtra evento e campo pelo contrato.
+  // Daqui só sai contagem, página, cor e método — nunca o trecho marcado nem o
+  // termo buscado, que são conteúdo de leitura, não telemetria.
+  const track = (name, fields) => window.bookAnalytics?.track(name, fields);
+
+  const reading = { seen: new Set(), deepest: 1, since: Date.now(), reported: false };
+
+  function durationBand(ms) {
+    const minutes = ms / 60000;
+    if (minutes < 1) return "under_1min";
+    if (minutes < 5) return "1_5min";
+    if (minutes < 15) return "5_15min";
+    return "over_15min";
+  }
+
+  function termBand(term) {
+    const length = term.trim().length;
+    if (length < 4) return "short";
+    if (length < 9) return "medium";
+    return "long";
+  }
+
+  function reportReading() {
+    if (reading.reported || reading.seen.size === 0) return;
+    reading.reported = true;
+    track("flipbook_reading_summary", {
+      pages_seen: reading.seen.size,
+      deepest_page: reading.deepest,
+      duration_band: durationBand(Date.now() - reading.since),
+      marks: marks.length,
+      bookmarks: bookmarks.length,
+    });
+  }
+
   /* ---------------------------------------------------------------- estado */
 
   const store = {
@@ -484,6 +520,15 @@
     const marked = pages.some((page) => bookmarks.includes(page));
     $("[data-action='bookmark']").setAttribute("aria-pressed", String(marked));
 
+    // Em página dupla o spread mostra duas páginas: contar só a da direita
+    // subestimaria pela metade a profundidade de leitura que o resumo reporta.
+    for (const seen of pages) {
+      if (reading.seen.has(seen)) continue;
+      reading.seen.add(seen);
+      track("flipbook_page_view", { page: seen, mode: state.mode });
+    }
+    if (pages.length) reading.deepest = Math.max(reading.deepest, ...pages);
+
     if (announce) dom.announce.textContent = `${shown} de ${book.page_count}. ${label}`;
     $$(".thumb").forEach((thumb) => {
       thumb.setAttribute("aria-current", String(pages.includes(Number(thumb.dataset.page))));
@@ -507,7 +552,7 @@
     }, ms + 20);
   }
 
-  function turn(direction, { silent = false } = {}) {
+  function turn(direction, { silent = false, method = "button" } = {}) {
     if (state.turning) return false;
     const forward = direction > 0;
     if (forward ? state.index >= maxIndex() : state.index === 0) return false;
@@ -515,6 +560,7 @@
     if (!node) return false;
 
     state.turning = true;
+    track("flipbook_turn", { direction: forward ? "next" : "prev", method });
     if (!silent) audio.page(direction);
     // a folha em movimento precisa passar por cima das duas pilhas
     node.style.zIndex = String(leafNodes.length + 2);
@@ -537,20 +583,21 @@
     state.index = previous;
   }
 
-  function goToPage(page, { silent = false } = {}) {
+  function goToPage(page, { silent = false, method = "jump" } = {}) {
     const target = clamp(Number(page) || 1, 1, book.page_count);
     const index = indexForPage(target);
     if (index === state.index) {
       render();
       return;
     }
-    const distance = Math.abs(index - state.index);
-    if (distance === 1) {
-      turn(index > state.index ? 1 : -1, { silent });
+    const forward = index > state.index;
+    if (Math.abs(index - state.index) === 1) {
+      turn(forward ? 1 : -1, { silent, method });
       return;
     }
     // salto longo: sem animação folha a folha, mas com o som de virada
-    if (!silent) audio.page(index > state.index ? 1 : -1);
+    track("flipbook_turn", { direction: forward ? "next" : "prev", method });
+    if (!silent) audio.page(forward ? 1 : -1);
     state.index = index;
     render();
   }
@@ -624,6 +671,7 @@
     state.turning = true;
 
     if (progress > COMMIT_AT) {
+      track("flipbook_turn", { direction: forward ? "next" : "prev", method: "drag" });
       audio.page(forward ? 1 : -1);
       updateEdge(state.index + (forward ? 1 : -1));
       animateLeaf(node, forward ? 1 : 0, () => {
@@ -703,6 +751,7 @@
     merged.text = selectionText(page, merged.from, merged.to);
     marks = marks.filter((mark) => !overlapping.includes(mark)).concat(merged);
     marks.sort((a, b) => a.page - b.page || a.from - b.from);
+    track("flipbook_mark", { page, color, action: "add" });
     persistMarks();
     renderMarks(page);
     renderMarkList();
@@ -716,6 +765,7 @@
     const before = marks.length;
     marks = marks.filter((mark) => !(mark.page === page && mark.from <= to && mark.to >= from));
     if (marks.length === before) return;
+    track("flipbook_mark", { page, action: "remove" });
     persistMarks();
     renderMarks(page);
     renderMarkList();
@@ -739,6 +789,7 @@
       audio.click(1320);
       toast(`Página ${page} marcada`);
     }
+    track("flipbook_bookmark", { page, action: index > -1 ? "remove" : "add" });
     persistBookmarks();
     renderRibbons();
     renderBookmarkList();
@@ -760,7 +811,7 @@
   // Cartão com duas ações irmãs — ir para a página e remover. Aninhar a segunda
   // dentro da primeira seria conteúdo interativo dentro de <button>: HTML
   // inválido e semântica ambígua para leitor de tela e teclado.
-  function entry({ accent, title, body, page, onRemove, onOpen }) {
+  function entry({ accent, title, body, page, onRemove, onOpen, method = "panel" }) {
     const node = document.createElement("div");
     node.className = "entry";
     node.style.setProperty("--accent", accent);
@@ -774,7 +825,7 @@
     open.append(heading);
     if (body) open.append(body);
     open.addEventListener("click", () => {
-      goToPage(page);
+      goToPage(page, { method });
       onOpen?.();
       if (window.innerWidth < 760) closePanel();
     });
@@ -817,7 +868,7 @@
       caption.textContent = String(page.n);
       button.append(img, caption);
       button.addEventListener("click", () => {
-        goToPage(page.n);
+        goToPage(page.n, { method: "thumb" });
         if (window.innerWidth < 760) closePanel();
       });
       dom.thumbs.append(button);
@@ -839,6 +890,7 @@
           title: `Página ${page}`,
           body,
           page,
+          method: "bookmark",
           onRemove: () => toggleBookmark(page),
         })
       );
@@ -860,10 +912,39 @@
           title: `Página ${mark.page}`,
           body: quote,
           page: mark.page,
+          method: "mark",
           onRemove: () => removeMarkAt(mark.page, mark.from, mark.to),
         })
       );
     }
+  }
+
+  // Estado da medição no painel: o sinal do navegador (DNT/GPC) vence e, quando
+  // presente, o botão some — não faria sentido reativar a medição por aqui.
+  function renderConsent() {
+    const analytics = window.bookAnalytics;
+    const button = $("[data-action='analytics']");
+    const label = $("[data-analytics-state]");
+    if (!button || !label) return;
+    if (!analytics) {
+      button.hidden = true;
+      label.textContent = "Medição indisponível nesta sessão.";
+      return;
+    }
+    const info = analytics.snapshot();
+    button.hidden = info.browser_signal;
+    button.textContent = info.enabled ? "Desativar medição" : "Ativar medição";
+    // o destino precisa aparecer aqui: prometer que nada sai do dispositivo
+    // enquanto há instância recebendo seria falso justamente no controle que a
+    // página de privacidade indica como forma de recusa
+    const destino = info.sink.configured
+      ? `enviados para a instância própria em ${info.sink.host}`
+      : "sem sair deste dispositivo";
+    label.textContent = info.browser_signal
+      ? "Desativada pelo sinal de privacidade do seu navegador."
+      : info.enabled
+        ? `Ativa nesta sessão: ${info.events} evento(s) de uso, ${destino}, sem texto marcado nem termo buscado.`
+        : "Desativada. Nenhum evento de uso está sendo registrado.";
   }
 
   function openPanel(view) {
@@ -877,6 +958,7 @@
       button.setAttribute("aria-expanded", String(button.dataset.panelToggle === view));
     });
     if (view === "busca") dom.searchInput.focus();
+    if (view === "marcacoes") renderConsent();
     window.requestAnimationFrame(layout);
   }
 
@@ -923,10 +1005,14 @@
   }
 
   let searchHits = [];
+  let searchSettle = 0;
 
   function runSearch(query) {
     dom.searchResults.textContent = "";
     searchHits = [];
+    // cancela antes do corte de tamanho: apagar o termo dentro da janela de
+    // espera não pode deixar a busca anterior escapar como se tivesse assentado
+    window.clearTimeout(searchSettle);
     const needle = fold(query.trim());
     if (needle.length < 2) {
       dom.searchSummary.textContent = "Digite ao menos duas letras para buscar nas 30 páginas.";
@@ -941,9 +1027,16 @@
       }
     }
     const count = searchHits.length;
+    const reached = new Set(searchHits.map((hit) => hit.page)).size;
     dom.searchSummary.textContent = count
-      ? `${count} ocorrência${count > 1 ? "s" : ""} em ${new Set(searchHits.map((hit) => hit.page)).size} página(s).`
+      ? `${count} ocorrência${count > 1 ? "s" : ""} em ${reached} página(s).`
       : "Nenhuma ocorrência nesta amostra de 30 páginas.";
+
+    // a busca roda a cada tecla; a medição espera o termo assentar para não
+    // registrar cada prefixo digitado como uma busca separada
+    searchSettle = window.setTimeout(() => {
+      track("flipbook_search", { hits: count, pages: reached, term_band: termBand(query) });
+    }, 900);
 
     for (const hit of searchHits) {
       const text = pageData(hit.page).text;
@@ -962,6 +1055,7 @@
           title: `Página ${hit.page}`,
           body,
           page: hit.page,
+          method: "search",
           // espera a virada assentar antes de pintar o destaque da ocorrência
           onOpen: () =>
             window.setTimeout(() => {
@@ -1017,14 +1111,15 @@
     link.download = `marcacoes-olho-seco-${book.edition}.md`;
     link.click();
     URL.revokeObjectURL(url);
+    track("flipbook_marks_export", { marks: marks.length, bookmarks: bookmarks.length });
     toast("Marcações exportadas");
   }
 
   /* ---------------------------------------------------------------- eventos */
 
   function bindEvents() {
-    $("[data-action='prev']").addEventListener("click", () => turn(-1));
-    $("[data-action='next']").addEventListener("click", () => turn(1));
+    $("[data-action='prev']").addEventListener("click", () => turn(-1, { method: "button" }));
+    $("[data-action='next']").addEventListener("click", () => turn(1, { method: "button" }));
 
     $("[data-action='bookmark']").addEventListener("click", () => toggleBookmark());
 
@@ -1036,6 +1131,7 @@
       resizeTextLayers();
       render();
       store.write("mode", state.mode);
+      track("flipbook_setting", { setting: "spread", state: state.mode });
       audio.click(760);
     });
 
@@ -1044,6 +1140,7 @@
       state.sound = !state.sound;
       soundButton.setAttribute("aria-pressed", String(state.sound));
       store.write("sound", state.sound);
+      track("flipbook_setting", { setting: "sound", state: state.sound ? "on" : "off" });
       if (state.sound) audio.click(980);
       toast(state.sound ? "Som ligado" : "Som desligado");
     });
@@ -1054,7 +1151,9 @@
       else document.documentElement.requestFullscreen?.().catch(() => toast("Tela cheia indisponível"));
     });
     document.addEventListener("fullscreenchange", () => {
-      fullscreenButton.setAttribute("aria-pressed", String(Boolean(document.fullscreenElement)));
+      const on = Boolean(document.fullscreenElement);
+      fullscreenButton.setAttribute("aria-pressed", String(on));
+      track("flipbook_setting", { setting: "fullscreen", state: on ? "on" : "off" });
       window.requestAnimationFrame(layout);
     });
 
@@ -1087,7 +1186,7 @@
         `${((page - 1) / Math.max(book.page_count - 1, 1)) * 100}%`
       );
     });
-    dom.scrub.addEventListener("change", () => goToPage(Number(dom.scrub.value)));
+    dom.scrub.addEventListener("change", () => goToPage(Number(dom.scrub.value), { method: "scrub" }));
 
     dom.searchForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -1143,7 +1242,7 @@
         if (now < wheelLock) return;
         wheelLock = now + 620;
         const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-        turn(delta > 0 ? 1 : -1);
+        turn(delta > 0 ? 1 : -1, { method: "wheel" });
       },
       { passive: true }
     );
@@ -1161,13 +1260,13 @@
       if (event.metaKey || event.ctrlKey || event.altKey) return;
 
       const actions = {
-        ArrowLeft: () => turn(-1),
-        ArrowRight: () => turn(1),
-        PageUp: () => turn(-1),
-        PageDown: () => turn(1),
-        " ": () => turn(1),
-        Home: () => goToPage(1),
-        End: () => goToPage(book.page_count),
+        ArrowLeft: () => turn(-1, { method: "keyboard" }),
+        ArrowRight: () => turn(1, { method: "keyboard" }),
+        PageUp: () => turn(-1, { method: "keyboard" }),
+        PageDown: () => turn(1, { method: "keyboard" }),
+        " ": () => turn(1, { method: "keyboard" }),
+        Home: () => goToPage(1, { method: "keyboard" }),
+        End: () => goToPage(book.page_count, { method: "keyboard" }),
         b: () => toggleBookmark(),
         m: () => $("[data-action='sound']").click(),
         f: () => $("[data-action='fullscreen']").click(),
@@ -1180,6 +1279,20 @@
       if (!action) return;
       event.preventDefault();
       action();
+    });
+
+    // Um resumo por sessão, no encerramento. Emitir também em
+    // `visibilitychange` fazia cada troca de aba mandar um resumo novo com
+    // contadores cumulativos, e somá-los na agregação contaria a mesma leitura
+    // várias vezes. `pagehide` é terminal e confiável, inclusive no iOS.
+    window.addEventListener("pagehide", reportReading);
+
+    $("[data-action='analytics']").addEventListener("click", () => {
+      const analytics = window.bookAnalytics;
+      if (!analytics) return;
+      const enabled = analytics.isEnabled() ? analytics.optOut() : analytics.optIn();
+      renderConsent();
+      toast(enabled ? "Medição de leitura ativada" : "Medição de leitura desativada");
     });
 
     let resizeTimer = 0;
@@ -1245,8 +1358,10 @@
 
     const saved = store.read("position", null);
     if (saved?.page) state.index = indexForPage(clamp(saved.page, 1, book.page_count));
+    track("flipbook_open", { mode: state.mode });
     render({ announce: false });
     bindEvents();
+    renderConsent();
 
     // a camada de palavras só é necessária para selecionar, marcar e destacar
     // busca: chega depois da primeira página já estar na tela

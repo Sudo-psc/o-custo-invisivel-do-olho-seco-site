@@ -16,9 +16,42 @@ if (parsed.protocol !== "https:" && !new Set(["127.0.0.1", "localhost"]).has(par
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 
-for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "assets", "entrevistas", "kit", "livro", "prontidao", "referencias", "servicos"]) {
+for (const name of ["index.html", "release.json", "robots.txt", ".nojekyll", "assets", "entrevistas", "kit", "livro", "privacidade", "prontidao", "referencias", "servicos"]) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
+
+// Destino da coleta analítica: sem as duas variáveis o arquivo continua nulo e
+// a camada não carrega script nem faz requisição. O identificador do site no
+// Umami é público; a chave de API do painel nunca entra no cliente.
+const umamiUrl = String(process.env.UMAMI_URL || "").trim();
+const umamiWebsiteId = String(process.env.UMAMI_WEBSITE_ID || "").trim();
+let sink = null;
+if (umamiUrl || umamiWebsiteId) {
+  if (!umamiUrl || !umamiWebsiteId) {
+    throw new Error("UMAMI_URL e UMAMI_WEBSITE_ID precisam ser definidas juntas.");
+  }
+  const parsedUmami = new URL(umamiUrl);
+  if (parsedUmami.protocol !== "https:") {
+    throw new Error("UMAMI_URL deve usar HTTPS.");
+  }
+  if (!/^[0-9a-f-]{16,64}$/i.test(umamiWebsiteId)) {
+    throw new Error("UMAMI_WEBSITE_ID não parece um identificador do Umami.");
+  }
+  // barra final garantida: instância em subcaminho (https://host/umami) não
+  // pode resolver o script para a raiz do domínio
+  const base = parsedUmami.href.replace(/\/?$/, "/");
+  sink = { provider: "umami", url: base, websiteId: umamiWebsiteId };
+}
+await writeFile(
+  resolve(output, "assets", "analytics-config.js"),
+  `window.ANALYTICS_SINK = ${JSON.stringify(sink)};\n`,
+  "utf8"
+);
+console.log(
+  sink
+    ? `APROVA: coleta analítica apontada para ${new URL(sink.url).host} com auto-track desligado`
+    : "APROVA: coleta analítica sem provedor; eventos permanecem no cliente"
+);
 
 // as páginas do flipbook são derivadas do PDF verificado, não versionadas:
 // gerar direto no artefato mantém o repositório sem binários redundantes
