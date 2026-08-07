@@ -56,6 +56,24 @@ O gerador falha se o sha256 ou a contagem de páginas divergirem de
 As imagens derivadas não são versionadas: `scripts/build-pages.mjs` roda o fluxo
 ao montar `_site/`. Requer `poppler-utils` (o workflow já instala).
 
+## Analytics
+
+`ANALYTICS-CONTRACT.md` é executável: a tabela de eventos é a fonte da verdade
+e `assets/events.js` a implementa em `SCHEMA`. Evento fora da tabela é
+descartado, campo fora da linha do evento é removido, e valores só podem ser
+número, booleano ou texto de até 64 caracteres — por isso o termo de busca e o
+trecho marcado não atravessam a camada, entram como faixa e contagem.
+
+Nada é transmitido: os eventos vão para `dataLayer`, para um `CustomEvent` por
+nome e para um buffer de sessão em memória. `Do Not Track` e `Global Privacy
+Control` desligam a coleta, e o leitor tem opt-out próprio em Marcações ›
+Medição de leitura.
+
+O gate reprova se a tabela e o `SCHEMA` divergirem, se algum `data-event` ou
+`track()` ficar fora do contrato, ou se aparecer `fetch`, `sendBeacon`,
+`XMLHttpRequest` ou URL na camada — conectar um provedor exige passar pelo gate
+humano descrito no contrato.
+
 ## Build e deploy
 
 O push na branch `main` aciona `.github/workflows/deploy-pages.yml`.

@@ -127,6 +127,12 @@
         <button type="button" class="ghost ghost--danger" data-action="clear-marks">Limpar tudo</button>
       </div>
       <p class="panel__note">As marcações ficam apenas neste navegador, no armazenamento local do dispositivo. Nada é enviado.</p>
+
+      <div class="panel__group">
+        <h3>Medição de leitura</h3>
+        <p class="panel__note" data-analytics-state></p>
+        <button type="button" class="ghost" data-action="analytics">Desativar medição</button>
+      </div>
     </section>
 
     <section class="panel__view" data-view="busca" hidden>
@@ -155,6 +161,7 @@
 
   <div class="toast" data-toast hidden role="status"></div>
 
+  <script src="../assets/events.js" defer></script>
   <script src="flipbook.js" defer></script>
 </body>
 </html>

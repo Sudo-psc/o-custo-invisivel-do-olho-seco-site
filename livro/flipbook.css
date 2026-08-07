@@ -591,6 +591,18 @@ body.reader {
 .turner--prev { left: clamp(.35rem, 1.5vw, 1.5rem); }
 .turner--next { right: clamp(.35rem, 1.5vw, 1.5rem); }
 
+/* com o painel aberto o palco cede a faixa da direita: sem isto o livro e o
+   botão de virar ficam por baixo da gaveta e deixam de ser clicáveis */
+@media (min-width: 900px) {
+  body.reader:not([data-panel=""]) .stage {
+    padding-right: calc(min(24rem, 100vw) + clamp(.5rem, 4vw, 4rem));
+  }
+
+  body.reader:not([data-panel=""]) .turner--next {
+    right: calc(min(24rem, 100vw) + clamp(.35rem, 1.5vw, 1.5rem));
+  }
+}
+
 .turner:hover:not(:disabled) {
   border-color: var(--line-strong);
   background: rgb(114 241 233 / 16%);
@@ -787,6 +799,18 @@ body.reader {
 
 .panel__group + .panel__group {
   margin-top: 1.6rem;
+}
+
+/* o bloco de medição vem depois da nota de privacidade das marcações e precisa
+   se separar dela, senão os dois textos se confundem num parágrafo só */
+.panel__note + .panel__group {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+
+.panel__group [data-analytics-state] {
+  margin: 0 0 .7rem;
 }
 
 .panel__group h3 {

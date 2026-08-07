@@ -195,6 +195,69 @@ build_pages = (ROOT / "scripts/build-pages.mjs").read_text(encoding="utf-8")
 if "buildFlipbook" not in build_pages or '"livro"' not in build_pages:
     fail("artefato Pages não inclui o flipbook")
 
+# O contrato de analytics é executável: a tabela do documento e o SCHEMA da
+# camada de coleta precisam declarar exatamente o mesmo conjunto de eventos, e
+# nenhum data-event do HTML pode ficar fora dele.
+contract = (ROOT / "ANALYTICS-CONTRACT.md").read_text(encoding="utf-8")
+table = re.search(
+    r"## Eventos permitidos\s*\n\n\|[^\n]*\n\|[-\s|]+\n(.*?)(?:\n\s*\n|\Z)", contract, re.S
+)
+if not table:
+    fail("tabela de eventos do contrato de analytics não encontrada")
+declared_events: set[str] = set()
+for row in table.group(1).splitlines():
+    cells = row.split("|")
+    if len(cells) < 2:
+        continue
+    declared_events |= set(re.findall(r"`([a-z_]+)`", cells[1]))
+if not declared_events:
+    fail("contrato de analytics sem eventos declarados")
+
+events_js = (ROOT / "assets/events.js").read_text(encoding="utf-8")
+schema = re.search(r"const SCHEMA = \{\n(.*?)\n  \};", events_js, re.S)
+if not schema:
+    fail("camada de coleta sem SCHEMA")
+implemented_events = set(re.findall(r"^\s{4}([a-z_]+):", schema.group(1), re.M))
+
+if declared_events != implemented_events:
+    missing = sorted(declared_events - implemented_events)
+    extra = sorted(implemented_events - declared_events)
+    fail(
+        "contrato e camada de analytics divergem: "
+        f"sem implementação {missing}, fora do contrato {extra}"
+    )
+
+used_events: set[str] = set()
+for path in html_files:
+    used_events |= set(re.findall(r'data-event="([a-z_]+)"', path.read_text(encoding="utf-8")))
+for relative in ("prontidao/index.html", "servicos/index.html", "livro/flipbook.js"):
+    used_events |= set(
+        re.findall(r'(?:bookTrack|track)\(\s*"([a-z_]+)"', (ROOT / relative).read_text(encoding="utf-8"))
+    )
+outside = sorted(used_events - declared_events)
+if outside:
+    fail(f"evento disparado fora do contrato de analytics: {outside}")
+
+for forbidden in ("fetch(", "sendBeacon", "XMLHttpRequest", "http://", "https://"):
+    if forbidden in events_js:
+        fail(
+            f"camada de analytics com transmissão externa ({forbidden}): "
+            "conectar provedor exige o gate humano do contrato"
+        )
+for needle in ("doNotTrack", "globalPrivacyControl", "analytics-optout", "MAX_STRING"):
+    if needle not in events_js:
+        fail(f"camada de analytics sem {needle}")
+if release["analytics_provider"] is not None:
+    fail("provedor de analytics declarado sem o gate do contrato")
+
+reader_privacy = (ROOT / "livro/flipbook.js").read_text(encoding="utf-8")
+for forbidden in ("term:", "query:", "text: term", "mark.text,"):
+    if forbidden in reader_privacy:
+        fail(f"leitor enviando conteúdo de leitura para analytics: {forbidden}")
+for needle in ("term_band: termBand(", "duration_band: durationBand("):
+    if needle not in reader_privacy:
+        fail(f"leitor sem agregação em faixas: {needle}")
+
 css = (ROOT / "assets/experience.css").read_text(encoding="utf-8")
 page_rule = re.search(r"\.page img\s*\{(?P<body>.*?)\}", css, re.S)
 if not page_rule or "height: auto;" not in page_rule.group("body"):
@@ -261,5 +324,6 @@ for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "al
 print(
     f"APROVA: site v{version}, capa e páginas responsivas, preços observados, "
     "amostra 30 páginas, flipbook com marcador de texto e de página, "
+    f"analytics com {len(declared_events)} eventos conforme o contrato e sem transmissão, "
     "venda desativada, entrevistas 8+8 e API sem segredo no cliente"
 )
