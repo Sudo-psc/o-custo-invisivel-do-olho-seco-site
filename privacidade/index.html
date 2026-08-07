@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#06131f">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="book-version" content="2.9.45">
+  <title>Privacidade e medição — O Custo Invisível do Olho Seco</title>
+  <meta name="description" content="O que este site mede, com que finalidade, por quanto tempo guarda e como exercer seus direitos.">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/experience.css">
+  <style>
+    .doc { max-width: 46rem; margin: 0 auto; padding: 6rem var(--gutter) 5rem; }
+    .doc h1 { font: 600 clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem)/1.15 var(--serif); margin: 0 0 .6rem; }
+    .doc .kicker { color: var(--cyan); font-size: .74rem; letter-spacing: .18em; text-transform: uppercase; margin: 0 0 1rem; }
+    .doc h2 { font: 600 1.15rem/1.3 var(--serif); margin: 2.6rem 0 .7rem; }
+    .doc p, .doc li { color: var(--ink-soft); }
+    .doc ul { padding-left: 1.1rem; }
+    .doc li { margin: .35rem 0; }
+    .doc table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .86rem; }
+    .doc th, .doc td { border: 1px solid var(--line); padding: .55rem .7rem; text-align: left; vertical-align: top; }
+    .doc th { color: var(--ink); font-weight: 600; }
+    .doc code { color: var(--cyan); font-family: var(--mono); font-size: .88em; }
+    .doc .lead { color: var(--ink); font-size: 1.05rem; }
+    .doc .callout { border: 1px solid var(--line); border-left: 3px solid var(--cyan-deep); border-radius: .5rem; padding: 1rem 1.1rem; margin: 1.6rem 0; background: rgb(10 26 38 / 55%); }
+    .doc .back { display: inline-flex; gap: .4rem; align-items: center; margin-bottom: 2rem; color: var(--muted); text-decoration: none; font-size: .84rem; }
+    .doc .back:hover { color: var(--ink); }
+    .doc .updated { color: var(--muted); font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <main class="doc">
+    <a class="back" href="../">← Voltar para o início</a>
+
+    <p class="kicker">Privacidade e medição</p>
+    <h1>O que este site mede</h1>
+    <p class="lead">Esta página descreve a medição de uso do site e da leitura da amostra: o que é coletado, para quê, por quanto tempo, e como recusar ou pedir exclusão. Ela vale para todas as rotas, inclusive o flipbook em <code>/livro/</code>.</p>
+
+    <h2>Quem responde pelos dados</h2>
+    <p>Dr. Philipe Saraiva Cruz — oftalmologista, CRM-MG 69.870, RQE 71.903, Caratinga (MG). Contato para qualquer assunto desta página: <a href="mailto:drphilipe.saraiva.oftalmo@gmail.com?subject=Privacidade%20%E2%80%94%20site%20do%20livro">drphilipe.saraiva.oftalmo@gmail.com</a>.</p>
+
+    <h2>O que é medido</h2>
+    <p>Apenas eventos de uso da interface, agregados e sem identificação. A lista é fechada e está publicada em <code>ANALYTICS-CONTRACT.md</code> no repositório do site. Um evento fora dessa lista é descartado antes de sair do navegador, e um campo fora da linha do evento é removido do envio.</p>
+
+    <table>
+      <thead>
+        <tr><th>Categoria</th><th>Exemplos</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Navegação</td><td>página visitada, host de onde você veio, cliques em amostra, kit, serviços e entrevistas</td></tr>
+        <tr><td>Leitura do flipbook</td><td>abertura, páginas vistas, direção e método da virada, formato de página única ou dupla</td></tr>
+        <tr><td>Marcações</td><td>que houve marcação de página ou de trecho, em que página, e a cor escolhida</td></tr>
+        <tr><td>Busca</td><td>quantas ocorrências e em quantas páginas, e apenas a faixa de tamanho do termo</td></tr>
+        <tr><td>Resumo da sessão</td><td>quantas páginas distintas, página mais profunda e faixa de duração</td></tr>
+      </tbody>
+    </table>
+
+    <h2>O que não é medido, em nenhuma hipótese</h2>
+    <ul>
+      <li>o texto dos trechos que você marca no livro;</li>
+      <li>o termo que você digita na busca — só o tamanho, em faixa;</li>
+      <li>nome, e-mail, organização ou qualquer identificador seu;</li>
+      <li>sintomas, diagnósticos, respostas individuais do questionário de prontidão ou escores;</li>
+      <li>conteúdo digitado em formulários ou em e-mails;</li>
+      <li>cruzamento com dados clínicos, trabalhistas ou de desempenho;</li>
+      <li>fingerprinting, cookies de rastreamento ou perfil comportamental.</li>
+    </ul>
+    <p>Restrições técnicas sustentam isso: os valores enviados só podem ser número, sinalizador ou texto curto, de modo que um trecho de livro ou um termo de busca não cabe no formato. Do endereço de onde você veio guarda-se apenas o host, nunca o caminho nem os parâmetros.</p>
+
+    <h2>Suas marcações não são medição</h2>
+    <p>As páginas e os trechos que você marca no leitor ficam no armazenamento local do seu dispositivo, no seu navegador. Não são enviados a lugar nenhum, e apagar os dados do site no navegador os remove definitivamente. A medição registra apenas <em>que</em> houve uma marcação, não o que ela dizia.</p>
+
+    <h2>Para que serve</h2>
+    <p>Entender se a amostra é lida até o fim, quais recursos do leitor são usados e quais rotas do site interessam — para decidir o que melhorar na edição e na interface. A medição não alimenta publicidade, não é vendida, não é compartilhada e não é cruzada com nenhuma outra base.</p>
+
+    <h2>Base legal</h2>
+    <p>Legítimo interesse do controlador em medir a audiência do próprio site, nos termos do art. 7º, IX, da Lei nº 13.709/2018 (LGPD). O tratamento é agregado, sem identificação e sem perfilamento, e você pode recusá-lo a qualquer momento pelos meios abaixo, sem qualquer perda de funcionalidade.</p>
+
+    <h2>Onde os dados ficam</h2>
+    <p>Numa instância própria de <a href="https://umami.is" rel="noopener noreferrer">Umami</a>, software livre de medição, operada pelo controlador. Não há Google Analytics, pixel de rede social, nem qualquer provedor de publicidade neste site. O script de medição sobe com rastreamento automático desligado: ele envia apenas os eventos da lista publicada, e nenhum a mais.</p>
+    <p>Enquanto a instância própria não estiver ativa, os eventos permanecem apenas no seu navegador, durante a sessão, e nada é transmitido.</p>
+
+    <h2>Cookies</h2>
+    <p>A medição não usa cookies e não cria identificador persistente de visitante. O site usa o armazenamento local do navegador apenas para o que é seu: suas marcações, sua posição de leitura, suas preferências de som e formato, e sua escolha sobre a medição.</p>
+
+    <h2>Por quanto tempo</h2>
+    <p>Os eventos de medição são mantidos por até 12 meses e depois descartados. Como não há identificador de pessoa, os registros são estatísticos desde a origem.</p>
+
+    <h2>Como recusar</h2>
+    <div class="callout">
+      <p><strong>No leitor:</strong> abra <em>Marcações</em> e use <em>Desativar medição</em>. A escolha vale imediatamente, fica guardada no seu dispositivo e nada mais é enviado.</p>
+      <p><strong>No navegador:</strong> se você tiver <em>Do Not Track</em> ou <em>Global Privacy Control</em> ativado, a medição já está desligada e nem o script de coleta é carregado. Esse sinal prevalece sobre qualquer ajuste nesta página.</p>
+    </div>
+
+    <h2>Seus direitos</h2>
+    <p>A LGPD assegura confirmação de tratamento, acesso, correção, anonimização, portabilidade, informação sobre compartilhamento e revogação. Escreva para <a href="mailto:drphilipe.saraiva.oftalmo@gmail.com?subject=Direitos%20do%20titular%20%E2%80%94%20site%20do%20livro">drphilipe.saraiva.oftalmo@gmail.com</a> e a resposta sai em até 15 dias.</p>
+    <p>Vale um aviso honesto: como a medição não guarda identificador seu, não há como localizar registros de uma pessoa específica para exclusão individual — não é uma recusa, é uma consequência de coletar o mínimo. O caminho eficaz para interromper a coleta é a recusa descrita acima, que produz efeito imediato.</p>
+
+    <h2>Entrevistas editoriais</h2>
+    <p>As entrevistas pré e pós-leitura em <a href="../entrevistas/">/entrevistas/</a> são um tratamento à parte, com finalidade editorial própria e consentimento pedido na própria página. Não são medição de audiência e não aparecem nos eventos descritos aqui.</p>
+
+    <h2>Mudanças</h2>
+    <p>Alterações no que é medido exigem mudar a lista publicada no repositório, que é verificada automaticamente a cada publicação: o site não entra no ar se o código coletar algo que este documento não declare.</p>
+
+    <p class="updated">Edição v2.9.45 · atualizado em 7 de agosto de 2026.</p>
+  </main>
+
+  <script src="../assets/analytics-config.js"></script>
+  <script src="../assets/events.js" defer></script>
+</body>
+</html>

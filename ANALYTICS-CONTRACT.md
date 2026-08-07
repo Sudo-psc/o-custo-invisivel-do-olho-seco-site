@@ -1,6 +1,8 @@
 # Contrato mínimo de analytics
 
-Estado: definido e implementado, ainda sem provedor conectado.
+Estado: definido, implementado e com provedor escolhido — instância própria de
+Umami, ligada por configuração de build. Sem `UMAMI_URL` e `UMAMI_WEBSITE_ID`
+o site não carrega script de medição nem faz requisição alguma.
 
 Este contrato é executável. A tabela abaixo é a fonte da verdade e
 `assets/events.js` a implementa em `SCHEMA`; `scripts/check-site.py` reprova se
@@ -68,14 +70,37 @@ campo é adicionado automaticamente.
 - `window.bookAnalytics.snapshot()` e `.events()` mostram exatamente o que foi
   coletado nesta sessão.
 
-## Gate antes de conectar um provedor
+## Provedor
 
-Definir responsável, finalidade, base legal quando aplicável, retenção,
-cookies, consentimento, política de privacidade, acesso e exclusão. Enquanto
-isso, os eventos permanecem apenas em `dataLayer`, em `CustomEvent` e num
-buffer de sessão em memória, sem transmissão externa e sem persistência.
+Instância própria de [Umami](https://umami.is), software livre, operada pelo
+controlador. Não há Google Analytics, pixel de rede social nem provedor de
+publicidade neste site.
 
-O ponto de conexão existe e está isolado: `window.bookAnalytics.connect(fn)`
-registra um consumidor. Não há `fetch`, `sendBeacon`, `XMLHttpRequest` nem URL
-externa em `assets/events.js`, e o validador reprova se aparecerem — de modo
-que ligar um provedor exige passar por este gate e atualizar este documento.
+| Item do gate | Definição |
+|---|---|
+| Responsável | Dr. Philipe Saraiva Cruz, CRM-MG 69.870, RQE 71.903 |
+| Finalidade | medir alcance da amostra e uso da interface para decidir edição e produto |
+| Base legal | legítimo interesse do controlador, art. 7º, IX, da LGPD |
+| Retenção | 12 meses, aplicada na instância |
+| Cookies | nenhum; sem identificador persistente de visitante |
+| Consentimento | dispensado pela ausência de cookie e de identificação, com recusa disponível |
+| Política de privacidade | `/privacidade/` |
+| Acesso e exclusão | canal público do site, com resposta em até 15 dias |
+
+O script sobe com `data-auto-track="false"`, então o provedor recebe apenas os
+eventos desta tabela — nenhuma visita, clique ou rolagem é capturada por conta
+própria. Com opt-out ou com sinal do navegador, o script sequer é solicitado.
+
+O endereço da instância nunca aparece no código: vem de `UMAMI_URL` e
+`UMAMI_WEBSITE_ID` no build, que geram `assets/analytics-config.js`. Não há
+`fetch`, `sendBeacon`, `XMLHttpRequest` nem URL em `assets/events.js`, e o
+validador reprova se aparecerem — trocar de destino é decisão de configuração,
+registrada em `release.json`, nunca código escondido no cliente.
+
+## Gate antes de trocar de provedor
+
+Redefinir responsável, finalidade, base legal, retenção, cookies,
+consentimento, política de privacidade, acesso e exclusão, e atualizar a tabela
+acima, `/privacidade/` e `release.json` na mesma mudança. O validador reprova
+se `analytics_provider` estiver declarado sem a página de privacidade
+publicada, sem retenção declarada e sem o provedor nomeado neste documento.

@@ -71,8 +71,42 @@ Medição de leitura.
 
 O gate reprova se a tabela e o `SCHEMA` divergirem, se algum `data-event` ou
 `track()` ficar fora do contrato, ou se aparecer `fetch`, `sendBeacon`,
-`XMLHttpRequest` ou URL na camada — conectar um provedor exige passar pelo gate
-humano descrito no contrato.
+`XMLHttpRequest` ou URL na camada.
+
+### Instância própria de Umami
+
+O destino é uma instância própria, ligada por configuração — o endereço nunca
+está no código. Sem as duas variáveis o site não carrega script de medição nem
+faz requisição alguma.
+
+```bash
+UMAMI_URL=https://metricas.seu-dominio.com.br \
+UMAMI_WEBSITE_ID=<uuid do site no painel> \
+INTERVIEW_API_URL=<endpoint> npm run build:pages
+```
+
+No GitHub Actions, as mesmas duas como variáveis do repositório. O build
+recusa endereço sem HTTPS, identificador malformado ou uma das duas sozinha.
+
+Para subir a instância (Docker, com Postgres):
+
+```bash
+git clone https://github.com/umami-software/umami.git && cd umami
+# defina DATABASE_URL e APP_SECRET no .env
+docker compose up -d
+```
+
+Depois, no painel: crie o site, copie o *Website ID*, e ajuste a retenção para
+os 12 meses declarados em `ANALYTICS-CONTRACT.md` e em `/privacidade/`.
+
+O script sobe com `data-auto-track="false"`, então a instância recebe apenas os
+eventos do contrato — nenhuma visita, clique ou rolagem é capturada por conta
+própria. Com opt-out do leitor ou com `Do Not Track`/`Global Privacy Control`,
+o script sequer é solicitado.
+
+Declarar `analytics_provider` em `release.json` obriga, pelo gate, a publicar
+`/privacidade/`, declarar retenção, manter `auto_track` e `cookies` em `false`
+e nomear o provedor no contrato.
 
 ## Build e deploy
 

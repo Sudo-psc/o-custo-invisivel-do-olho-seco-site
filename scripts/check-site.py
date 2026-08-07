@@ -120,6 +120,7 @@ active_version_files = (
     "kit/index.html",
     "kit/COMPATIBILITY.md",
     "livro/index.html",
+    "privacidade/index.html",
     "prontidao/index.html",
     "referencias/index.html",
     "servicos/index.html",
@@ -272,8 +273,40 @@ for forbidden in ("fetch(", "sendBeacon", "XMLHttpRequest", "http://", "https://
 for needle in ("doNotTrack", "globalPrivacyControl", "analytics-optout", "MAX_STRING"):
     if needle not in events_js:
         fail(f"camada de analytics sem {needle}")
-if release["analytics_provider"] is not None:
-    fail("provedor de analytics declarado sem o gate do contrato")
+
+# O destino vem da configuração gerada no build, nunca do código; e o script do
+# provedor só pode subir com auto-track desligado e com a medição ligada.
+config_js = (ROOT / "assets/analytics-config.js").read_text(encoding="utf-8")
+if not re.search(r"window\.ANALYTICS_SINK\s*=\s*null\s*;", config_js):
+    fail("configuração de analytics versionada deve ser nula; o destino vem do build")
+for needle in ("autoTrack", "isEnabled()", "ANALYTICS_SINK"):
+    if needle not in events_js:
+        fail(f"conexão do provedor sem {needle}")
+if 'script.dataset.autoTrack = "false"' not in events_js:
+    fail("script do provedor sem auto-track desligado")
+if "UMAMI_URL" not in build_pages or "UMAMI_WEBSITE_ID" not in build_pages:
+    fail("build não injeta o destino da coleta")
+
+# Declarar provedor obriga a publicar o aviso e a fechar os itens do gate.
+provider = release["analytics_provider"]
+if provider is not None:
+    analytics = release.get("analytics", {})
+    notice = ROOT / str(analytics.get("privacy_notice", ""))
+    if not notice.is_file():
+        fail("provedor declarado sem página de privacidade publicada")
+    if analytics.get("auto_track") is not False or analytics.get("cookies") is not False:
+        fail("provedor declarado com auto-track ou cookie")
+    if not isinstance(analytics.get("retention_months"), int):
+        fail("provedor declarado sem retenção definida")
+    for needle in ("umami", "Retenção", "Base legal", "/privacidade/"):
+        if needle.lower() not in contract.lower():
+            fail(f"contrato não documenta o provedor: {needle}")
+    notice_text = notice.read_text(encoding="utf-8")
+    for needle in ("Base legal", "Como recusar", "Seus direitos", "mailto:", "12 meses"):
+        if needle not in notice_text:
+            fail(f"aviso de privacidade sem {needle}")
+    if 'href="privacidade/"' not in home:
+        fail("aviso de privacidade não está linkado na página inicial")
 
 reader_privacy = (ROOT / "livro/flipbook.js").read_text(encoding="utf-8")
 for forbidden in ("term:", "query:", "text: term", "mark.text,"):
@@ -349,6 +382,7 @@ for needle in ("ALLOWED_ORIGINS", "NOTION_API_KEY", "NOTION_DATA_SOURCE_ID", "al
 print(
     f"APROVA: site v{version}, capa e páginas responsivas, preços observados, "
     "amostra 30 páginas, flipbook com marcador de texto e de página, "
-    f"analytics com {len(declared)} eventos e campos conforme o contrato e sem transmissão, "
+    f"analytics com {len(declared)} eventos e campos conforme o contrato, "
+    f"destino {provider or 'nenhum'} sem auto-track e com aviso publicado, "
     "venda desativada, entrevistas 8+8 e API sem segredo no cliente"
 )

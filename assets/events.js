@@ -6,10 +6,15 @@
  * Um evento fora da lista é descartado; um campo fora da lista é removido antes
  * de qualquer coisa sair daqui.
  *
- * Nada é transmitido. Os eventos vão para `dataLayer`, para um `CustomEvent`
- * por nome e para um buffer de sessão em memória. Conectar um provedor externo
- * exige o gate humano descrito no contrato — por isso não há fetch, beacon nem
- * URL neste arquivo, e o validador reprova se aparecerem.
+ * Os eventos vão para `dataLayer`, para um `CustomEvent` por nome e para um
+ * buffer de sessão em memória. Quando há uma instância própria de Umami
+ * configurada em assets/analytics-config.js, eles também são enviados para
+ * ela — e só eles: o script sobe com auto-track desligado, então nada além do
+ * que o SCHEMA permite sai daqui.
+ *
+ * O endereço nunca é fixo neste arquivo; vem da configuração gerada no build.
+ * O validador reprova URL, fetch, beacon ou XHR no código, de modo que trocar
+ * de destino é decisão de configuração, não de código escondido no cliente.
  */
 
 (() => {
@@ -140,6 +145,8 @@
       /* armazenamento indisponível: a escolha vale só para esta sessão */
     }
     if (value) buffer.length = 0;
+    // religar depois de um opt-out precisa carregar o script que não subiu
+    if (!value && isEnabled()) connectConfiguredSink();
     window.dispatchEvent(new CustomEvent("book:analytics-consent", { detail: { enabled: isEnabled() } }));
     return isEnabled();
   }
@@ -176,7 +183,56 @@
   // Nome histórico, mantido para os scripts embutidos das rotas internas.
   window.bookTrack = track;
 
+  /* ----------------------------------------- instância própria de Umami */
+
+  // O script só entra na página se houver instância configurada e se a medição
+  // estiver ligada: com opt-out ou com sinal do navegador, nem a requisição do
+  // script acontece. `auto-track` desligado é o que garante que o provedor veja
+  // exatamente os eventos do contrato, e nenhum a mais.
+  let sinkConnected = false;
+
+  function connectConfiguredSink() {
+    if (sinkConnected) return;
+    const config = window.ANALYTICS_SINK;
+    if (!config?.url || !config?.websiteId || !isEnabled()) return;
+    sinkConnected = true;
+
+    let endpoint;
+    try {
+      endpoint = new URL("script.js", config.url);
+    } catch {
+      sinkConnected = false;
+      return; // configuração inválida: segue sem provedor, sem quebrar a página
+    }
+
+    const waiting = [];
+    const send = ({ event: name, ...props }) => {
+      if (typeof window.umami?.track === "function") window.umami.track(name, props);
+      else waiting.push({ event: name, ...props });
+    };
+
+    const script = document.createElement("script");
+    script.defer = true;
+    script.src = endpoint.href;
+    script.dataset.websiteId = config.websiteId;
+    script.dataset.autoTrack = "false";
+    script.dataset.doNotTrack = "true";
+    script.addEventListener("load", () => {
+      for (const item of waiting.splice(0)) send(item);
+    });
+    document.head.append(script);
+
+    // o que já passou pela camada antes do script existir não se perde
+    for (const item of buffer) {
+      const { at, ...event } = item;
+      void at;
+      send(event);
+    }
+    sinks.add(send);
+  }
+
   track("page_view", { referrer_host: referrerHost() });
+  connectConfiguredSink();
 
   document.querySelectorAll("[data-event]").forEach((element) => {
     element.addEventListener("click", () => {

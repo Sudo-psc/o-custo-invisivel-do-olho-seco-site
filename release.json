@@ -46,7 +46,17 @@
       "source": "https://clubedeautores.com.br/livro/o-custo-invisivel-do-olho-seco-2"
     }
   },
-  "analytics_provider": null,
+  "analytics_provider": "umami_self_hosted",
+  "analytics": {
+    "state": "configured_pending_instance",
+    "endpoint_source": "build_env:UMAMI_URL,UMAMI_WEBSITE_ID",
+    "auto_track": false,
+    "cookies": false,
+    "retention_months": 12,
+    "legal_basis": "lgpd_art_7_ix_legitimate_interest",
+    "privacy_notice": "privacidade/index.html",
+    "controller": "Dr. Philipe Saraiva Cruz"
+  },
   "interviews": {
     "questionnaire_version": "1.0.0",
     "data_collection": "editorial_responses_only"
