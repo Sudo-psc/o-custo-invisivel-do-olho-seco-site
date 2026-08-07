@@ -37,7 +37,10 @@ if (umamiUrl || umamiWebsiteId) {
   if (!/^[0-9a-f-]{16,64}$/i.test(umamiWebsiteId)) {
     throw new Error("UMAMI_WEBSITE_ID não parece um identificador do Umami.");
   }
-  sink = { provider: "umami", url: parsedUmami.href, websiteId: umamiWebsiteId };
+  // barra final garantida: instância em subcaminho (https://host/umami) não
+  // pode resolver o script para a raiz do domínio
+  const base = parsedUmami.href.replace(/\/?$/, "/");
+  sink = { provider: "umami", url: base, websiteId: umamiWebsiteId };
 }
 await writeFile(
   resolve(output, "assets", "analytics-config.js"),

@@ -264,11 +264,13 @@ outside = sorted(used_events - set(declared))
 if outside:
     fail(f"evento disparado fora do contrato de analytics: {outside}")
 
+# Não prova ausência de tráfego — o envio real é o script do provedor. Prova
+# que não há endpoint fixo nem transporte improvisado fora da configuração.
 for forbidden in ("fetch(", "sendBeacon", "XMLHttpRequest", "http://", "https://"):
     if forbidden in events_js:
         fail(
-            f"camada de analytics com transmissão externa ({forbidden}): "
-            "conectar provedor exige o gate humano do contrato"
+            f"camada de analytics com endpoint fixo ou transporte próprio ({forbidden}): "
+            "o destino tem de vir da configuração gerada no build"
         )
 for needle in ("doNotTrack", "globalPrivacyControl", "analytics-optout", "MAX_STRING"):
     if needle not in events_js:
@@ -279,6 +281,12 @@ for needle in ("doNotTrack", "globalPrivacyControl", "analytics-optout", "MAX_ST
 config_js = (ROOT / "assets/analytics-config.js").read_text(encoding="utf-8")
 if not re.search(r"window\.ANALYTICS_SINK\s*=\s*null\s*;", config_js):
     fail("configuração de analytics versionada deve ser nula; o destino vem do build")
+# opt-out fora do leitor: todas as rotas medem, e o aviso é o caminho de recusa
+notice_optout = (ROOT / "privacidade/index.html").read_text(encoding="utf-8")
+for needle in ("bookAnalytics", "optOut", "alternar-medicao"):
+    if needle not in notice_optout:
+        fail(f"aviso de privacidade sem controle de recusa: {needle}")
+
 for needle in ("autoTrack", "isEnabled()", "ANALYTICS_SINK"):
     if needle not in events_js:
         fail(f"conexão do provedor sem {needle}")

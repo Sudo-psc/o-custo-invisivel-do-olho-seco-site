@@ -34,8 +34,9 @@ observadas.
 `/livro/` é um leitor HTML5 da mesma amostra de 30 páginas: virada de página em
 3D com som sintetizado, marcador de texto sobre a camada de palavras do PDF,
 marcador de página, busca no texto, índice em miniaturas e retomada da leitura.
-Não depende de biblioteca externa nem de rede além do próprio site; marcações e
-posição ficam no `localStorage` do dispositivo e nada é transmitido.
+Não depende de biblioteca externa. As marcações e a posição de leitura ficam no
+`localStorage` do dispositivo e nunca são transmitidas — o que a medição
+registra é apenas *que* houve marcação, nunca o trecho. Veja Analytics abaixo.
 
 O fluxo de geração parte do contrato, não do repositório:
 
@@ -64,10 +65,11 @@ descartado, campo fora da linha do evento é removido, e valores só podem ser
 número, booleano ou texto de até 64 caracteres — por isso o termo de busca e o
 trecho marcado não atravessam a camada, entram como faixa e contagem.
 
-Nada é transmitido: os eventos vão para `dataLayer`, para um `CustomEvent` por
-nome e para um buffer de sessão em memória. `Do Not Track` e `Global Privacy
-Control` desligam a coleta, e o leitor tem opt-out próprio em Marcações ›
-Medição de leitura.
+Os eventos vão para `dataLayer`, para um `CustomEvent` por nome e para um
+buffer de sessão em memória. Enquanto não houver instância configurada, é só
+isso: nada é transmitido. Com instância, os mesmos eventos — e apenas eles —
+seguem para ela. `Do Not Track` e `Global Privacy Control` desligam a coleta, e
+há opt-out em `/privacidade/` e no leitor, em Marcações › Medição de leitura.
 
 O gate reprova se a tabela e o `SCHEMA` divergirem, se algum `data-event` ou
 `track()` ficar fora do contrato, ou se aparecer `fetch`, `sendBeacon`,

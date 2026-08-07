@@ -13,14 +13,17 @@
  * que o SCHEMA permite sai daqui.
  *
  * O endereço nunca é fixo neste arquivo; vem da configuração gerada no build.
- * O validador reprova URL, fetch, beacon ou XHR no código, de modo que trocar
- * de destino é decisão de configuração, não de código escondido no cliente.
+ * O validador reprova URL, fetch, beacon e XHR aqui — o que ele garante é que
+ * não existe endpoint fixo nem transporte improvisado, não que nada trafega:
+ * o envio real acontece pelo script do provedor, e depende da configuração.
  */
 
 (() => {
   "use strict";
 
-  // Campos aceitos em qualquer evento, preenchidos por esta camada.
+  // Campos aceitos em qualquer evento, preenchidos por esta camada. A lista
+  // governa o payload de verdade: mexer nela muda o que sai, e é isso que dá
+  // sentido à asserção do validador sobre os campos base.
   const BASE_FIELDS = ["version", "route"];
 
   // Evento -> campos próprios permitidos. Espelha a tabela do contrato.
@@ -54,6 +57,12 @@
   const version = document.querySelector('meta[name="book-version"]')?.content || "unknown";
   const buffer = [];
   const sinks = new Set();
+  let sinkConnected = false;
+
+  const BASE_VALUES = {
+    version: () => version,
+    route: () => window.location.pathname,
+  };
 
   // Do Not Track e Global Privacy Control desligam a medição e não podem ser
   // sobrepostos pelo controle da página: um sinal do navegador vale mais que
@@ -111,7 +120,11 @@
     if (!allowed) return null; // evento fora do contrato: descartado
     if (!isEnabled()) return null;
 
-    const event = { event: name, version, route: window.location.pathname };
+    const event = { event: name };
+    for (const key of BASE_FIELDS) {
+      const value = cleanValue(BASE_VALUES[key]?.());
+      if (value !== null) event[key] = value;
+    }
     for (const key of allowed) {
       if (!(key in fields)) continue;
       const value = cleanValue(fields[key]);
@@ -152,6 +165,20 @@
   }
 
   // Agregado do que foi coletado nesta sessão, para inspeção pelo próprio leitor.
+  function sinkInfo() {
+    const config = window.ANALYTICS_SINK;
+    const configured = Boolean(config?.url && config?.websiteId);
+    let host = null;
+    if (configured) {
+      try {
+        host = new URL(config.url).host;
+      } catch {
+        return { configured: false, connected: false, host: null };
+      }
+    }
+    return { configured, connected: sinkConnected, host };
+  }
+
   function snapshot() {
     const counts = {};
     for (const item of buffer) counts[item.event] = (counts[item.event] || 0) + 1;
@@ -161,6 +188,7 @@
       version,
       events: buffer.length,
       counts,
+      sink: sinkInfo(),
       contract: Object.keys(SCHEMA).sort(),
     };
   }
@@ -173,6 +201,7 @@
     optOut: () => setOptOut(true),
     optIn: () => setOptOut(false),
     snapshot,
+    sink: sinkInfo,
     events: () => buffer.map((item) => ({ ...item })),
     connect: (sink) => {
       if (typeof sink === "function") sinks.add(sink);
@@ -189,8 +218,6 @@
   // estiver ligada: com opt-out ou com sinal do navegador, nem a requisição do
   // script acontece. `auto-track` desligado é o que garante que o provedor veja
   // exatamente os eventos do contrato, e nenhum a mais.
-  let sinkConnected = false;
-
   function connectConfiguredSink() {
     if (sinkConnected) return;
     const config = window.ANALYTICS_SINK;
@@ -199,16 +226,27 @@
 
     let endpoint;
     try {
-      endpoint = new URL("script.js", config.url);
+      // a barra final é obrigatória: sem ela, uma instância publicada em
+      // subcaminho teria o prefixo descartado e o script seria buscado na raiz
+      // do domínio, quebrando a medição em silêncio
+      endpoint = new URL("script.js", config.url.replace(/\/?$/, "/"));
     } catch {
       sinkConnected = false;
       return; // configuração inválida: segue sem provedor, sem quebrar a página
     }
 
+    // Fila do que chega antes do script carregar. Limitada, porque um provedor
+    // bloqueado ou fora do ar não pode fazer a fila crescer sem fim.
+    const MAX_WAITING = 100;
+    let available = false;
     const waiting = [];
     const send = ({ event: name, ...props }) => {
-      if (typeof window.umami?.track === "function") window.umami.track(name, props);
-      else waiting.push({ event: name, ...props });
+      if (available && typeof window.umami?.track === "function") {
+        window.umami.track(name, props);
+        return;
+      }
+      waiting.push({ event: name, ...props });
+      if (waiting.length > MAX_WAITING) waiting.shift();
     };
 
     const script = document.createElement("script");
@@ -218,7 +256,14 @@
     script.dataset.autoTrack = "false";
     script.dataset.doNotTrack = "true";
     script.addEventListener("load", () => {
+      available = true;
       for (const item of waiting.splice(0)) send(item);
+    });
+    script.addEventListener("error", () => {
+      // provedor inalcançável: desliga o consumidor e libera a fila
+      sinks.delete(send);
+      sinkConnected = false;
+      waiting.length = 0;
     });
     document.head.append(script);
 

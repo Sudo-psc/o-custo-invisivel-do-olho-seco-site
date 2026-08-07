@@ -525,7 +525,6 @@
     for (const seen of pages) {
       if (reading.seen.has(seen)) continue;
       reading.seen.add(seen);
-      reading.reported = false;
       track("flipbook_page_view", { page: seen, mode: state.mode });
     }
     if (pages.length) reading.deepest = Math.max(reading.deepest, ...pages);
@@ -935,10 +934,16 @@
     const info = analytics.snapshot();
     button.hidden = info.browser_signal;
     button.textContent = info.enabled ? "Desativar medição" : "Ativar medição";
+    // o destino precisa aparecer aqui: prometer que nada sai do dispositivo
+    // enquanto há instância recebendo seria falso justamente no controle que a
+    // página de privacidade indica como forma de recusa
+    const destino = info.sink.configured
+      ? `enviados para a instância própria em ${info.sink.host}`
+      : "sem sair deste dispositivo";
     label.textContent = info.browser_signal
       ? "Desativada pelo sinal de privacidade do seu navegador."
       : info.enabled
-        ? `Ativa nesta sessão: ${info.events} evento(s) de uso, sem texto marcado nem termo buscado, e nada sai do dispositivo.`
+        ? `Ativa nesta sessão: ${info.events} evento(s) de uso, ${destino}, sem texto marcado nem termo buscado.`
         : "Desativada. Nenhum evento de uso está sendo registrado.";
   }
 
@@ -1276,11 +1281,10 @@
       action();
     });
 
-    // o resumo sai quando a aba deixa a cena: `pagehide` é o gancho confiável
-    // no iOS e `visibilitychange` cobre a troca de aba no resto
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") reportReading();
-    });
+    // Um resumo por sessão, no encerramento. Emitir também em
+    // `visibilitychange` fazia cada troca de aba mandar um resumo novo com
+    // contadores cumulativos, e somá-los na agregação contaria a mesma leitura
+    // várias vezes. `pagehide` é terminal e confiável, inclusive no iOS.
     window.addEventListener("pagehide", reportReading);
 
     $("[data-action='analytics']").addEventListener("click", () => {

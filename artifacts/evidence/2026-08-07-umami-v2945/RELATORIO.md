@@ -101,6 +101,48 @@ Comportamento no artefato `_site`, com a instância interceptada no navegador:
 - `/privacidade/` sem overflow horizontal em 390 px;
 - zero erro de console em todas as rotas.
 
+## Revisão do PR
+
+Oito achados, todos procedentes. Três eram consequência de o lote ter
+transformado um buffer local num destino remoto sem revisar as afirmações que
+descreviam o estado anterior.
+
+- **O painel do leitor afirmava "nada sai do dispositivo"** mesmo com a
+  instância configurada e recebendo. Era falso justamente no controle que
+  `/privacidade/` indica como forma de recusa. O texto passa a nomear o
+  destino: "enviados para a instância própria em ⟨host⟩". Verificado.
+- **Instância em subcaminho quebrava em silêncio.** `new URL("script.js", url)`
+  descarta o prefixo quando a base não termina em barra, então uma instância
+  publicada em `⟨host⟩/umami` buscava o script na raiz do domínio e recebia 404,
+  sem erro visível. Barra final garantida no build e no cliente. Verificado:
+  a URL solicitada preserva `/umami/script.js`.
+- **A recusa só existia dentro do leitor**, mas todas as rotas medem. O aviso
+  ganhou o mesmo controle, e ele vale para o site inteiro. Verificado: recusar
+  em `/privacidade/` e ir para a landing deixa `isEnabled()` falso e
+  `dataLayer` vazio.
+- **Fila do provedor sem limite nem tratamento de erro.** Com o script
+  bloqueado ou fora do ar, a fila crescia pela vida da página. Passou a ter
+  teto de 100 e a desconectar o consumidor no `error`. Verificado com a
+  requisição abortada: a página segue viva e o leitor funciona.
+- **`BASE_FIELDS` era constante decorativa** — `track()` montava
+  `version`/`route` na mão, então a asserção do validador sobre campos base não
+  detectava desvio nenhum. Agora a lista governa o payload.
+- **Vários resumos por sessão, com contadores cumulativos.** Cada página nova
+  re-armava `reported`, então cada troca de aba emitia um resumo novo somando
+  tudo de novo; agregá-los contaria a mesma leitura várias vezes. Passou a sair
+  um único resumo, no `pagehide`. Verificado: três trocas de aba produzem zero
+  resumos, e o `pagehide` produz exatamente um.
+- **O gate era vendido como prova de não-transmissão.** Ele proíbe `fetch`,
+  `sendBeacon`, `XHR` e URL na camada — o que garante ausência de endpoint fixo
+  e de transporte improvisado, não ausência de tráfego, já que o envio real é o
+  script do provedor. A mensagem e o comentário passam a dizer isso.
+- **README se contradizia**: "Nada é transmitido" vinte linhas acima da seção
+  do Umami. Ganhou a mesma qualificação que `/privacidade/` já trazia.
+
+Nota: ao reescrever o comentário do primeiro achado, escrevi uma URL de exemplo
+literal no código e o gate reprovou — a proibição de URL na camada funcionando
+como projetada.
+
 ## Pendências do controlador
 
 O código está pronto e inerte. Falta, e só o controlador pode fazer:

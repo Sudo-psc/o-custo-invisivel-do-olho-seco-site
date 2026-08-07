@@ -29,6 +29,9 @@
     .doc .back { display: inline-flex; gap: .4rem; align-items: center; margin-bottom: 2rem; color: var(--muted); text-decoration: none; font-size: .84rem; }
     .doc .back:hover { color: var(--ink); }
     .doc .updated { color: var(--muted); font-size: .8rem; }
+    .doc .ghost { padding: .55rem .9rem; border: 1px solid var(--line-strong); border-radius: .5rem; background: rgb(114 241 233 / 10%); color: var(--cyan); font: inherit; font-size: .86rem; cursor: pointer; }
+    .doc .ghost:hover { background: rgb(114 241 233 / 18%); }
+    .doc #estado-medicao { margin-bottom: .6rem; }
   </style>
 </head>
 <body>
@@ -91,7 +94,10 @@
 
     <h2>Como recusar</h2>
     <div class="callout">
-      <p><strong>No leitor:</strong> abra <em>Marcações</em> e use <em>Desativar medição</em>. A escolha vale imediatamente, fica guardada no seu dispositivo e nada mais é enviado.</p>
+      <p><strong>Aqui, agora:</strong> a escolha vale para todo o site, fica guardada no seu dispositivo e tem efeito imediato.</p>
+      <p id="estado-medicao">Carregando o estado da medição…</p>
+      <p><button type="button" class="ghost" id="alternar-medicao" hidden>Desativar medição</button></p>
+      <p><strong>No leitor:</strong> o mesmo controle está em <em>Marcações › Medição de leitura</em>, dentro de <a href="../livro/">/livro/</a>.</p>
       <p><strong>No navegador:</strong> se você tiver <em>Do Not Track</em> ou <em>Global Privacy Control</em> ativado, a medição já está desligada e nem o script de coleta é carregado. Esse sinal prevalece sobre qualquer ajuste nesta página.</p>
     </div>
 
@@ -110,5 +116,37 @@
 
   <script src="../assets/analytics-config.js"></script>
   <script src="../assets/events.js" defer></script>
+  <script defer>
+    // O opt-out precisa existir fora do leitor: todas as rotas medem, e esta é
+    // a página que o aviso indica como caminho de recusa.
+    document.addEventListener("DOMContentLoaded", () => {
+      const estado = document.getElementById("estado-medicao");
+      const botao = document.getElementById("alternar-medicao");
+      const analytics = window.bookAnalytics;
+      if (!analytics) {
+        estado.textContent = "A medição não está disponível nesta sessão.";
+        return;
+      }
+      const pintar = () => {
+        const info = analytics.snapshot();
+        botao.hidden = info.browser_signal;
+        botao.textContent = info.enabled ? "Desativar medição" : "Ativar medição";
+        const destino = info.sink.configured
+          ? "enviados para a instância própria em " + info.sink.host
+          : "mantidos apenas neste navegador, sem sair do dispositivo";
+        estado.textContent = info.browser_signal
+          ? "Desativada pelo sinal de privacidade do seu navegador. Nada é registrado."
+          : info.enabled
+            ? "Medição ativa: eventos de uso " + destino + "."
+            : "Medição desativada neste dispositivo. Nenhum evento está sendo registrado.";
+      };
+      botao.addEventListener("click", () => {
+        if (analytics.isEnabled()) analytics.optOut();
+        else analytics.optIn();
+        pintar();
+      });
+      pintar();
+    });
+  </script>
 </body>
 </html>
