@@ -18,6 +18,7 @@ import { execFile } from "node:child_process";
 import { mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { promisify } from "node:util";
+import { pathToFileURL } from "node:url";
 
 const run = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
@@ -174,8 +175,7 @@ export async function buildFlipbook({ outDir, quiet = false } = {}) {
   const release = JSON.parse(await readFile(resolve(root, "release.json"), "utf8"));
   const pdfPath = resolve(root, release.sample.path);
 
-  await requireTool("pdftoppm");
-  await requireTool("pdftotext");
+  for (const tool of ["pdfinfo", "pdftoppm", "pdftotext"]) await requireTool(tool);
 
   if (!(await stat(pdfPath).catch(() => null))) throw new Error(`amostra ausente: ${release.sample.path}`);
   const digest = await sha256(pdfPath);
@@ -272,7 +272,9 @@ export async function buildFlipbook({ outDir, quiet = false } = {}) {
   return manifest;
 }
 
-if (import.meta.filename === process.argv[1]) {
+// comparação por URL: resiste a symlink, separador do Windows e caminho
+// relativo em process.argv[1], ao contrário de comparar strings de caminho
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const flag = process.argv.indexOf("--out");
   await buildFlipbook({ outDir: flag > -1 ? process.argv[flag + 1] : undefined });
 }

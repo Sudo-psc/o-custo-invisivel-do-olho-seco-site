@@ -89,6 +89,32 @@ Leitor exercitado no artefato `_site` com Chromium:
 - amostra:
   `0589b6f2fa38e017f26217f424943af8837ef0bc4f062d0aafbd2e5be1f20cb2`.
 
+## Rodada de review (PR #3)
+
+- **Virada além da última página em página única** (Codex, P2): confirmado. Com
+  uma folha por página, o índice máximo é `leafModel.length - 1`, não
+  `leafModel.length` — passar dele esvaziava o palco, o indicador voltava a
+  "Página 1" e a posição salva era corrompida. Introduzido `maxIndex()` por
+  modo, aplicado ao botão, ao teclado, ao arrasto e aos limites de `clamp`.
+  Verificado nos dois modos: na página 30, três `ArrowRight`, um clique e um
+  arrasto completo são rejeitados; o indicador e a posição salva permanecem em
+  30 na recarga.
+- **`pdfinfo` fora do preflight** (Copilot): confirmado. `readPdfInfo()` o usa,
+  mas só `pdftoppm` e `pdftotext` eram verificados — sem `pdfinfo` o erro seria
+  um ENOENT cru, sem a dica de instalar `poppler-utils`. Incluído.
+- **Conteúdo interativo aninhado em `<button>`** (Copilot): confirmado. O item
+  da lista era um `<button>` com um `<span role="button" tabindex="0">` dentro.
+  O cartão passou a ser um `<div>` com dois botões irmãos — `.entry__open` e
+  `.entry__drop`, este com `aria-label` nomeando a página. Verificado: zero
+  elementos interativos aninhados, e `Enter` no "×" remove sem disparar a
+  navegação do cartão.
+- **`import.meta.filename`** (Copilot): a premissa não procede — `filename` e
+  `dirname` foram adicionados juntos no Node 20.11, e `build-pages.mjs` já
+  dependia de `import.meta.dirname` antes deste lote. Ainda assim a comparação
+  passou a ser `import.meta.url === pathToFileURL(process.argv[1]).href`, forma
+  canônica que resiste a symlink e a caminho relativo. `npm run build:livro`
+  segue executando o fluxo.
+
 ## Ressalva registrada
 
 A landing mantém 14 px de overflow horizontal em 390 × 844, originados de

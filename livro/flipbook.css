@@ -893,25 +893,35 @@ body.reader {
 
 .entry {
   position: relative;
-  display: grid;
-  gap: .25rem;
-  width: 100%;
-  padding: .6rem .7rem;
   border: 1px solid var(--line);
   border-left: 3px solid var(--accent, var(--cyan-deep));
   border-radius: .45rem;
   background: rgb(10 26 38 / 70%);
-  color: var(--ink-soft);
-  font: inherit;
-  font-size: .82rem;
-  text-align: left;
-  cursor: pointer;
   transition: border-color .2s, background .2s;
 }
 
 .entry:hover {
   border-color: var(--line-strong);
   background: var(--panel-high);
+}
+
+.entry__open {
+  display: grid;
+  gap: .25rem;
+  width: 100%;
+  padding: .6rem .7rem;
+  border: none;
+  border-radius: inherit;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: .82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entry--removable .entry__open {
+  padding-right: 1.8rem;
 }
 
 .entry b {
@@ -937,14 +947,15 @@ body.reader {
 
 .entry__drop {
   position: absolute;
-  top: .35rem;
-  right: .35rem;
-  padding: .1rem .35rem;
+  top: .3rem;
+  right: .3rem;
+  padding: .15rem .4rem;
   border: none;
   border-radius: .3rem;
   background: none;
   color: var(--muted);
-  font-size: .9rem;
+  font: inherit;
+  font-size: .95rem;
   line-height: 1;
   cursor: pointer;
 }

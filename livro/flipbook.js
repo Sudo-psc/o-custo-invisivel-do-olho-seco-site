@@ -201,6 +201,11 @@
     }
   }
 
+  // Em página dupla, virar a última folha é legítimo: sobra a contracapa à
+  // esquerda. Em página única não há lado esquerdo, então o índice máximo é a
+  // própria última folha — passar dela deixaria o palco vazio.
+  const maxIndex = () => (state.mode === "double" ? leafModel.length : leafModel.length - 1);
+
   const leftPage = () => (state.mode === "double" ? leafModel[state.index - 1]?.back ?? null : null);
   const rightPage = () => leafModel[state.index]?.front ?? null;
   const visiblePages = () => [leftPage(), rightPage()].filter(Boolean);
@@ -259,7 +264,7 @@
       return node;
     });
     dom.book.dataset.mode = state.mode;
-    state.index = clamp(state.index, 0, leafModel.length);
+    state.index = clamp(state.index, 0, maxIndex());
   }
 
   // Só as folhas próximas recebem `src`: 30 páginas de uma vez seriam 5 MB de
@@ -475,7 +480,7 @@
     );
 
     $("[data-action='prev']").disabled = state.index === 0;
-    $("[data-action='next']").disabled = state.index >= leafModel.length;
+    $("[data-action='next']").disabled = state.index >= maxIndex();
     const marked = pages.some((page) => bookmarks.includes(page));
     $("[data-action='bookmark']").setAttribute("aria-pressed", String(marked));
 
@@ -505,8 +510,8 @@
   function turn(direction, { silent = false } = {}) {
     if (state.turning) return false;
     const forward = direction > 0;
-    const leafIndex = forward ? state.index : state.index - 1;
-    const node = leafNodes[leafIndex];
+    if (forward ? state.index >= maxIndex() : state.index === 0) return false;
+    const node = leafNodes[forward ? state.index : state.index - 1];
     if (!node) return false;
 
     state.turning = true;
@@ -527,7 +532,7 @@
 
   function loadNearbyImagesFor(index) {
     const previous = state.index;
-    state.index = clamp(index, 0, leafModel.length);
+    state.index = clamp(index, 0, maxIndex());
     loadNearbyImages();
     state.index = previous;
   }
@@ -585,8 +590,8 @@
     if (drag.provisional) {
       if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy)) return; // gesto ainda ambíguo
       const forward = dx < 0;
-      const index = forward ? state.index : state.index - 1;
-      const node = leafNodes[index];
+      const blocked = forward ? state.index >= maxIndex() : state.index === 0;
+      const node = blocked ? null : leafNodes[forward ? state.index : state.index - 1];
       if (!node) {
         drag.provisional = false;
         return;
@@ -752,35 +757,37 @@
 
   /* ---------------------------------------------------------------- painéis */
 
-  function entry({ accent, title, body, page, onRemove }) {
-    const node = document.createElement("button");
-    node.type = "button";
+  // Cartão com duas ações irmãs — ir para a página e remover. Aninhar a segunda
+  // dentro da primeira seria conteúdo interativo dentro de <button>: HTML
+  // inválido e semântica ambígua para leitor de tela e teclado.
+  function entry({ accent, title, body, page, onRemove, onOpen }) {
+    const node = document.createElement("div");
     node.className = "entry";
     node.style.setProperty("--accent", accent);
     node.dataset.page = String(page);
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "entry__open";
     const heading = document.createElement("b");
     heading.textContent = title;
-    node.append(heading);
-    if (body) node.append(body);
-    node.addEventListener("click", () => {
+    open.append(heading);
+    if (body) open.append(body);
+    open.addEventListener("click", () => {
       goToPage(page);
+      onOpen?.();
       if (window.innerWidth < 760) closePanel();
     });
+    node.append(open);
+
     if (onRemove) {
-      const drop = document.createElement("span");
+      node.classList.add("entry--removable");
+      const drop = document.createElement("button");
+      drop.type = "button";
       drop.className = "entry__drop";
-      drop.setAttribute("role", "button");
-      drop.tabIndex = 0;
-      drop.title = "Remover";
+      drop.setAttribute("aria-label", `Remover marcação da página ${page}`);
       drop.textContent = "×";
-      const fire = (event) => {
-        event.stopPropagation();
-        onRemove();
-      };
-      drop.addEventListener("click", fire);
-      drop.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") fire(event);
-      });
+      drop.addEventListener("click", onRemove);
       node.append(drop);
     }
     return node;
@@ -949,21 +956,22 @@
       strong.textContent = text.slice(hit.at, hit.at + hit.length);
       body.append(strong, text.slice(hit.at + hit.length, to));
       if (to < text.length) body.append("…");
-      const node = entry({
-        accent: MARK_COLORS.ciano,
-        title: `Página ${hit.page}`,
-        body,
-        page: hit.page,
-      });
-      node.addEventListener("click", () => {
-        window.setTimeout(() => {
-          const range = wordRangeAt(hit.page, hit.at, hit.length);
-          if (!range) return;
-          renderMarks(hit.page, [range]);
-          window.setTimeout(() => renderMarks(hit.page), 3200);
-        }, 260);
-      });
-      dom.searchResults.append(node);
+      dom.searchResults.append(
+        entry({
+          accent: MARK_COLORS.ciano,
+          title: `Página ${hit.page}`,
+          body,
+          page: hit.page,
+          // espera a virada assentar antes de pintar o destaque da ocorrência
+          onOpen: () =>
+            window.setTimeout(() => {
+              const range = wordRangeAt(hit.page, hit.at, hit.length);
+              if (!range) return;
+              renderMarks(hit.page, [range]);
+              window.setTimeout(() => renderMarks(hit.page), 3200);
+            }, 260),
+        })
+      );
     }
   }
 
